@@ -1,0 +1,167 @@
+{
+    "build-runtime": true,
+    "id": "org.hawaiios.Sdk",
+    "id-platform": "org.hawaiios.Platform",
+    "branch": "master",
+    "runtime": "org.freedesktop.Platform",
+    "sdk": "org.freedesktop.Sdk",
+    "runtime-version": "master",
+    "writable-sdk": true,
+    "sdk-extensions": ["org.freedesktop.Sdk.Debug", "org.freedesktop.Sdk.Locale"],
+    "platform-extensions": [ "org.freedesktop.Platform.Locale"],
+    "metadata": "metadata.sdk",
+    "metadata-platform": "metadata.platform",
+    "cleanup": [ "/cache",
+                 "/man",
+                 "/share/doc",
+                 "/share/man",
+                 "/share/gtk-doc",
+                 "/share/devhelp",
+                 "/lib/systemd",
+                 "*.la", "*.a"],
+    "cleanup-commands": [ "touch -d @0 /usr/share/fonts",
+                          "touch -d @0 /usr/share/fonts/*"
+                          "fc-cache -fs"
+                        ],
+    "cleanup-platform": [ "/include",
+                          "/share/aclocal",
+                          "/share/pkgconfig",
+                          "/lib/pkgconfig",
+                          "/share/gir-1.0",
+                          "/share/vala"
+                        ],
+    "build-options" : {
+        "cflags": "-O2 -g",
+        "cxxflags": "-O2 -g",
+        "env": {
+            "V": "1"
+        },
+        "arch": {
+            "x86_64": {
+                "cflags": "-O3 -g",
+                "cxxflags": "-O3 -g"
+            }
+        }
+    },
+    "modules": [
+        {
+            "name": "glib",
+            "config-opts": [ "--with-pcre=system" ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://git.gnome.org/glib"
+                }
+            ]
+        },
+        {
+            "name": "gobject-introspection",
+            "config-opts": ["--disable-static"],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://git.gnome.org/gobject-introspection"
+                }
+            ]
+        },
+        {
+            "name": "pango",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://git.gnome.org/pango"
+                }
+            ]
+        },
+        {
+            "name": "atk",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://git.gnome.org/atk"
+                }
+            ]
+        },
+        {
+            "name": "at-spi2-core",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://git.gnome.org/at-spi2-core"
+                }
+            ]
+        },
+        {
+            "name": "at-spi2-atk",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://git.gnome.org/at-spi2-atk"
+                }
+            ]
+        },
+        {
+            "name": "gstreamer",
+            "config-opts": ["--disable-gtk-doc", "--enable-debug", "--disable-examples" ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://anongit.freedesktop.org/gstreamer/gstreamer"
+                }
+            ]
+        },
+        {
+            "name": "gstreamer-plugins-base",
+            "config-opts": ["--disable-gtk-doc", "--enable-experimental", "--enable-orc" ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-base"
+                }
+            ]
+        },
+        {
+            "name": "gstreamer-plugins-good",
+            "config-opts": ["--disable-gtk-doc", "--enable-experimental", "--enable-orc" ,
+                            "--disable-monoscope",
+                            "--disable-aalib",
+                            "--disable-cairo",
+                            "--disable-libcaca",
+                            "--disable-jack",
+                            "--with-default-visualizer=autoaudiosink" ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-good"
+                }
+            ]
+        },
+        {
+            "name": "gstreamer-plugins-bad",
+            "config-opts": ["--disable-gtk-doc", "--enable-experimental", "--enable-orc" ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-bad"
+                }
+            ]
+        },
+        {
+            "name": "qtbase",
+            "config-opts": [
+                "-confirm-license", "-opensource", "-release", "-plugin-sql-sqlite",
+                "-system-sqlite", "-openssl-linked", "-nomake", "examples",
+                "-no-rpath", "-optimized-qmake", "-dbus-linked", "-system-harfbuzz",
+                "-no-xcb", "-no-eglfs", "-no-kms", "-no-gbm", "-no-directfb",
+                "-no-mirclient", "-no-linuxfb", "-qpa", "wayland"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtbase",
+                    "branch": "5.6.0"
+                }
+            ]
+        }
+    ]
+}

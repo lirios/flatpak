@@ -1,0 +1,17 @@
+[Runtime]
+name=org.hawaiios.Sdk
+runtime=org.hawaiios.Platform/x86_64/master
+sdk=org.hawaiios.Sdk/x86_64/master
+
+[Extension org.freedesktop.Platform.GL]
+version=1.2
+directory=lib/GL
+
+[Extension org.freedesktop.Platform.Timezones]
+version=1.2
+directory=share/zoneinfo
+
+[Environment]
+GI_TYPELIB_PATH=/app/lib/girepository-1.0
+GST_PLUGIN_PATH=/app/lib/gstreamer-1.0
+LD_LIBRARY_PATH=/app/lib:/usr/lib/GL
