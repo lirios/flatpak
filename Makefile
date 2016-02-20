@@ -1,5 +1,4 @@
 all: repo org.hawaiios.Sdk.json
-	rm -rf sdk
 	xdg-app-builder --ccache --build-only --disable-updates --require-changes --repo=repo --subject="Build of org.hawaiios.Sdk, `date`" ${EXPORT_ARGS} sdk org.hawaiios.Sdk.json
 
 update: repo org.hawaiios.Sdk.json
@@ -10,3 +9,6 @@ fetch:
 
 repo:
 	ostree init --mode=archive-z2 --repo=repo
+
+clean:
+	@rm -rf sdk
