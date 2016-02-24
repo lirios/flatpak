@@ -1,6 +1,28 @@
 {
-    "runtime": "org.freedesktop.Platform",
-    "metadata": "metadata.sdk",
+    "build-runtime": true,
+    "cleanup-commands": [
+        "touch -d @0 /usr/share/fonts",
+        "touch -d @0 /usr/share/fonts/*",
+        "fc-cache -fs"
+    ],
+    "cleanup-platform": [
+        "/include",
+        "/share/aclocal",
+        "/share/pkgconfig",
+        "/lib/pkgconfig",
+        "/share/gir-1.0",
+        "/share/vala"
+    ],
+    "metadata-platform": "metadata.platform",
+    "sdk-extensions": [
+        "org.freedesktop.Sdk.Debug",
+        "org.freedesktop.Sdk.Locale"
+    ],
+    "platform-extensions": [
+        "org.freedesktop.Platform.Locale"
+    ],
+    "sdk": "org.freedesktop.Sdk",
+    "branch": "master",
     "cleanup": [
         "/cache",
         "/man",
@@ -12,67 +34,30 @@
         "*.la",
         "*.a"
     ],
-    "sdk-extensions": [
-        "org.freedesktop.Sdk.Debug",
-        "org.freedesktop.Sdk.Locale"
-    ],
-    "sdk": "org.freedesktop.Sdk",
-    "build-runtime": true,
-    "runtime-version": "master",
-    "cleanup-commands": [
-        "touch -d @0 /usr/share/fonts",
-        "touch -d @0 /usr/share/fonts/*",
-        "fc-cache -fs"
-    ],
     "writable-sdk": true,
-    "build-options": {
-        "arch": {
-            "x86_64": {
-                "cxxflags": "-O3 -g",
-                "cflags": "-O3 -g"
-            }
-        },
-        "cxxflags": "-O2 -g",
-        "env": {
-            "V": "1"
-        },
-        "cflags": "-O2 -g"
-    },
-    "cleanup-platform": [
-        "/include",
-        "/share/aclocal",
-        "/share/pkgconfig",
-        "/lib/pkgconfig",
-        "/share/gir-1.0",
-        "/share/vala"
-    ],
-    "id-platform": "org.hawaiios.Platform",
-    "metadata-platform": "metadata.platform",
-    "platform-extensions": [
-        "org.freedesktop.Platform.Locale"
-    ],
+    "id": "org.hawaiios.Sdk",
     "modules": [
         {
+            "name": "glib",
             "config-opts": [
                 "--with-pcre=system"
             ],
-            "name": "glib",
             "sources": [
                 {
-                    "url": "git://git.gnome.org/glib",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://git.gnome.org/glib"
                 }
             ]
         },
         {
+            "name": "gobject-introspection",
             "config-opts": [
                 "--disable-static"
             ],
-            "name": "gobject-introspection",
             "sources": [
                 {
-                    "url": "git://git.gnome.org/gobject-introspection",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://git.gnome.org/gobject-introspection"
                 }
             ]
         },
@@ -80,8 +65,8 @@
             "name": "pango",
             "sources": [
                 {
-                    "url": "git://git.gnome.org/pango",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://git.gnome.org/pango"
                 }
             ]
         },
@@ -89,8 +74,8 @@
             "name": "atk",
             "sources": [
                 {
-                    "url": "git://git.gnome.org/atk",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://git.gnome.org/atk"
                 }
             ]
         },
@@ -98,8 +83,8 @@
             "name": "at-spi2-core",
             "sources": [
                 {
-                    "url": "git://git.gnome.org/at-spi2-core",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://git.gnome.org/at-spi2-core"
                 }
             ]
         },
@@ -107,40 +92,41 @@
             "name": "at-spi2-atk",
             "sources": [
                 {
-                    "url": "git://git.gnome.org/at-spi2-atk",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://git.gnome.org/at-spi2-atk"
                 }
             ]
         },
         {
+            "name": "gstreamer",
             "config-opts": [
                 "--disable-gtk-doc",
                 "--enable-debug",
                 "--disable-examples"
             ],
-            "name": "gstreamer",
             "sources": [
                 {
-                    "url": "git://anongit.freedesktop.org/gstreamer/gstreamer",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://anongit.freedesktop.org/gstreamer/gstreamer"
                 }
             ]
         },
         {
+            "name": "gstreamer-plugins-base",
             "config-opts": [
                 "--disable-gtk-doc",
                 "--enable-experimental",
                 "--enable-orc"
             ],
-            "name": "gstreamer-plugins-base",
             "sources": [
                 {
-                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-base",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-base"
                 }
             ]
         },
         {
+            "name": "gstreamer-plugins-good",
             "config-opts": [
                 "--disable-gtk-doc",
                 "--enable-experimental",
@@ -152,29 +138,29 @@
                 "--disable-jack",
                 "--with-default-visualizer=autoaudiosink"
             ],
-            "name": "gstreamer-plugins-good",
             "sources": [
                 {
-                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-good",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-good"
                 }
             ]
         },
         {
+            "name": "gstreamer-plugins-bad",
             "config-opts": [
                 "--disable-gtk-doc",
                 "--enable-experimental",
                 "--enable-orc"
             ],
-            "name": "gstreamer-plugins-bad",
             "sources": [
                 {
-                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-bad",
-                    "type": "git"
+                    "type": "git",
+                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-bad"
                 }
             ]
         },
         {
+            "name": "qt5-qtbase",
             "config-opts": [
                 "-confirm-license",
                 "-opensource",
@@ -209,12 +195,11 @@
                 "-no-mirclient",
                 "-system-proxies"
             ],
-            "name": "qt5-qtbase",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtbase-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "51902393deff832593cd28d8d9780f055bc77726c5bdb5fce1dec2b30500b806",
                     "type": "archive",
-                    "md5": "82e5bd59946630ec36ab357f1779f411"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtbase-opensource-src-5.6.0-rc.tar.xz"
                 }
             ]
         },
@@ -222,9 +207,9 @@
             "name": "qt5-qtsvg",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtsvg-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "e43968fd547267afcc49692f4516daa3a7967c706a9dcaf81d87b758336cfe32",
                     "type": "archive",
-                    "md5": "43c783d833303a99ba596509cd95a9fd"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtsvg-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -239,9 +224,9 @@
             "name": "qt5-qtxmlpatterns",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtxmlpatterns-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "a8c363e1b8c002b9d6934fac1f787020b8efcc1f9cc5233de881557600d1fe33",
                     "type": "archive",
-                    "md5": "e0074dc01ef945930c99a4501d3bdaf0"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtxmlpatterns-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -256,9 +241,9 @@
             "name": "qt5-qtdeclarative",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtdeclarative-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "084ecce310af7f1cd169fffada6660bd7fa71af531c9bb8f8b093e4bbcd6755f",
                     "type": "archive",
-                    "md5": "b87cda11d7a3d3cd02487217832b5516"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtdeclarative-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -273,9 +258,9 @@
             "name": "qt5-qtgraphicaleffects",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtgraphicaleffects-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "901285c7de632cce74223d588e320d6848a46a653c1647e23a325b06612ad4ac",
                     "type": "archive",
-                    "md5": "7344c2946baebbcd528aca1c92ec8c54"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtgraphicaleffects-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -290,9 +275,9 @@
             "name": "qt5-qtquickcontrols",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtquickcontrols-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "ee02c69a9bcd9fb13d0566e2a4f7c86911c00ef627b8a5afdc526a1d3186fd64",
                     "type": "archive",
-                    "md5": "469d3ce771b15bf0d21a4bcd8598f047"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtquickcontrols-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -307,9 +292,9 @@
             "name": "qt5-qtquickcontrols2",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtquickcontrols2-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "a666ad670f85e1feddbf6aa8718b5bd362ad7f3bf650e77e7f65cdde211fccfe",
                     "type": "archive",
-                    "md5": "b8809f5a7f7b513c6fc88b9f8712c0d0"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtquickcontrols2-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -324,9 +309,9 @@
             "name": "qt5-qtmultimedia",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtmultimedia-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "d4d5fde798863348beb1fa5fa24cb18a9d53af7d341f065474548fa92a8d7276",
                     "type": "archive",
-                    "md5": "f9a4ca0a0bb92e8e8ba947a1e53903ea"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtmultimedia-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -341,9 +326,9 @@
             "name": "qt5-qttools",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qttools-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "f12ed323845d3836a9dc5361197d150f226cd67189013feb4e59eb7ffac56a53",
                     "type": "archive",
-                    "md5": "348fcbaeaa4a68720f6d03d8e283a04c"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qttools-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -358,9 +343,9 @@
             "name": "qt5-qtimageformats",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtimageformats-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "005f51eef0cfff4bbc343eb4a4b1af36e6614ba55784d64e44b4b3174e1e7690",
                     "type": "archive",
-                    "md5": "c98c64571b0df33a001f38641521a16d"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtimageformats-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -375,9 +360,9 @@
             "name": "qt5-qtwayland",
             "sources": [
                 {
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtwayland-opensource-src-5.6.0-rc.tar.xz",
+                    "sha256": "89c8ae5ef2e21f79846a57ef9114b93cbd9e898055ae3d2786768c30f9936ca1",
                     "type": "archive",
-                    "md5": "b45023b3cf382444d257c94dd96a5351"
+                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtwayland-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
                     "command": [
@@ -389,6 +374,21 @@
             ]
         }
     ],
-    "id": "org.hawaiios.Sdk",
-    "branch": "master"
+    "metadata": "metadata.sdk",
+    "id-platform": "org.hawaiios.Platform",
+    "build-options": {
+        "cxxflags": "-O2 -g",
+        "env": {
+            "V": "1"
+        },
+        "arch": {
+            "x86_64": {
+                "cxxflags": "-O3 -g",
+                "cflags": "-O3 -g"
+            }
+        },
+        "cflags": "-O2 -g"
+    },
+    "runtime-version": "master",
+    "runtime": "org.freedesktop.Platform"
 }
