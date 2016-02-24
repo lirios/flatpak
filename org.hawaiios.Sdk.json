@@ -34,6 +34,7 @@
         "/include",
         "/share/aclocal",
         "/share/pkgconfig",
+        "/lib/cmake",
         "/lib/pkgconfig",
         "/share/gir-1.0",
         "/share/vala"
