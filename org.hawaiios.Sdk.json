@@ -220,7 +220,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtsvg-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -238,7 +238,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtxmlpatterns-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -256,7 +256,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtdeclarative-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -274,7 +274,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtgraphicaleffects-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -292,7 +292,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtquickcontrols-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -310,7 +310,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtquickcontrols2-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -328,7 +328,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtmultimedia-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -346,7 +346,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qttools-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -364,7 +364,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtimageformats-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
@@ -382,7 +382,7 @@
                     "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtwayland-opensource-src-5.6.0-rc.tar.xz"
                 },
                 {
-                    "command": [
+                    "commands": [
                         "qmake"
                     ],
                     "dest-filename": "configure",
