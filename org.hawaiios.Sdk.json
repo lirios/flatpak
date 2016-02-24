@@ -1,5 +1,30 @@
 {
+    "branch": "master",
+    "build-options": {
+        "arch": {
+            "x86_64": {
+                "cflags": "-O3 -g",
+                "cxxflags": "-O3 -g"
+            }
+        },
+        "cflags": "-O2 -g",
+        "cxxflags": "-O2 -g",
+        "env": {
+            "V": "1"
+        }
+    },
     "build-runtime": true,
+    "cleanup": [
+        "/cache",
+        "/man",
+        "/share/doc",
+        "/share/man",
+        "/share/gtk-doc",
+        "/share/devhelp",
+        "/lib/systemd",
+        "*.la",
+        "*.a"
+    ],
     "cleanup-commands": [
         "touch -d @0 /usr/share/fonts",
         "touch -d @0 /usr/share/fonts/*",
@@ -13,35 +38,16 @@
         "/share/gir-1.0",
         "/share/vala"
     ],
-    "metadata-platform": "metadata.platform",
-    "sdk-extensions": [
-        "org.freedesktop.Sdk.Debug",
-        "org.freedesktop.Sdk.Locale"
-    ],
-    "platform-extensions": [
-        "org.freedesktop.Platform.Locale"
-    ],
-    "sdk": "org.freedesktop.Sdk",
-    "branch": "master",
-    "cleanup": [
-        "/cache",
-        "/man",
-        "/share/doc",
-        "/share/man",
-        "/share/gtk-doc",
-        "/share/devhelp",
-        "/lib/systemd",
-        "*.la",
-        "*.a"
-    ],
-    "writable-sdk": true,
     "id": "org.hawaiios.Sdk",
+    "id-platform": "org.hawaiios.Platform",
+    "metadata": "metadata.sdk",
+    "metadata-platform": "metadata.platform",
     "modules": [
         {
-            "name": "glib",
             "config-opts": [
                 "--with-pcre=system"
             ],
+            "name": "glib",
             "sources": [
                 {
                     "type": "git",
@@ -50,10 +56,10 @@
             ]
         },
         {
-            "name": "gobject-introspection",
             "config-opts": [
                 "--disable-static"
             ],
+            "name": "gobject-introspection",
             "sources": [
                 {
                     "type": "git",
@@ -98,12 +104,12 @@
             ]
         },
         {
-            "name": "gstreamer",
             "config-opts": [
                 "--disable-gtk-doc",
                 "--enable-debug",
                 "--disable-examples"
             ],
+            "name": "gstreamer",
             "sources": [
                 {
                     "type": "git",
@@ -112,12 +118,12 @@
             ]
         },
         {
-            "name": "gstreamer-plugins-base",
             "config-opts": [
                 "--disable-gtk-doc",
                 "--enable-experimental",
                 "--enable-orc"
             ],
+            "name": "gstreamer-plugins-base",
             "sources": [
                 {
                     "type": "git",
@@ -126,7 +132,6 @@
             ]
         },
         {
-            "name": "gstreamer-plugins-good",
             "config-opts": [
                 "--disable-gtk-doc",
                 "--enable-experimental",
@@ -138,6 +143,7 @@
                 "--disable-jack",
                 "--with-default-visualizer=autoaudiosink"
             ],
+            "name": "gstreamer-plugins-good",
             "sources": [
                 {
                     "type": "git",
@@ -146,12 +152,12 @@
             ]
         },
         {
-            "name": "gstreamer-plugins-bad",
             "config-opts": [
                 "--disable-gtk-doc",
                 "--enable-experimental",
                 "--enable-orc"
             ],
+            "name": "gstreamer-plugins-bad",
             "sources": [
                 {
                     "type": "git",
@@ -160,7 +166,6 @@
             ]
         },
         {
-            "name": "qt5-qtbase",
             "config-opts": [
                 "-confirm-license",
                 "-opensource",
@@ -195,6 +200,7 @@
                 "-no-mirclient",
                 "-system-proxies"
             ],
+            "name": "qt5-qtbase",
             "sources": [
                 {
                     "sha256": "51902393deff832593cd28d8d9780f055bc77726c5bdb5fce1dec2b30500b806",
@@ -374,21 +380,15 @@
             ]
         }
     ],
-    "metadata": "metadata.sdk",
-    "id-platform": "org.hawaiios.Platform",
-    "build-options": {
-        "cxxflags": "-O2 -g",
-        "env": {
-            "V": "1"
-        },
-        "arch": {
-            "x86_64": {
-                "cxxflags": "-O3 -g",
-                "cflags": "-O3 -g"
-            }
-        },
-        "cflags": "-O2 -g"
-    },
+    "platform-extensions": [
+        "org.freedesktop.Platform.Locale"
+    ],
+    "runtime": "org.freedesktop.Platform",
     "runtime-version": "master",
-    "runtime": "org.freedesktop.Platform"
+    "sdk": "org.freedesktop.Sdk",
+    "sdk-extensions": [
+        "org.freedesktop.Sdk.Debug",
+        "org.freedesktop.Sdk.Locale"
+    ],
+    "writable-sdk": true
 }
