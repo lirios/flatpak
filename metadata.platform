@@ -1,7 +1,7 @@
 [Runtime]
-name=org.hawaiios.Platform
-runtime=org.hawaiios.Platform/x86_64/master
-sdk=org.hawaiios.Sdk/x86_64/master
+name=io.liri.Platform
+runtime=io.liri.Platform/x86_64/master
+sdk=io.liri.Sdk/x86_64/master
 
 [Extension org.freedesktop.Platform.GL]
 version=1.2

@@ -39,8 +39,8 @@
         "/share/gir-1.0",
         "/share/vala"
     ],
-    "id": "org.hawaiios.Sdk",
-    "id-platform": "org.hawaiios.Platform",
+    "id": "io.liri.Sdk",
+    "id-platform": "io.liri.Platform",
     "metadata": "metadata.sdk",
     "metadata-platform": "metadata.platform",
     "modules": [

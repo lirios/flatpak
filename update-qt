@@ -37,7 +37,7 @@ if __name__ == "__main__":
         print("Wrong version specified, use the MAJOR.MINOR.PATCHLEVEL format", file=sys.stderr)
         sys.exit(1)
 
-    fp = open("org.hawaiios.Sdk.json", "r")
+    fp = open("io.liri.Sdk.json", "r")
     data = json.loads(fp.read())
     for module in data.get("modules", []):
         if module["name"].startswith("qt5-") and len(module.get("sources", [])) >= 1:
@@ -61,5 +61,5 @@ if __name__ == "__main__":
                 print("Failed to parse module name for %s" % module["name"], file=sys.stderr)
                 sys.exit(1)
 
-    with open("org.hawaiios.Sdk.json", "w") as fp:
+    with open("io.liri.Sdk.json", "w") as fp:
         fp.write(json.dumps(data, sort_keys=True, indent=4))
