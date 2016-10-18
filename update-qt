@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 filename = "%s-opensource-src-%s.tar.xz" % (module_name, version)
 
                 destfilename, sha256 = download(download_url + "/" + filename, filename)
-                finaldir = os.path.join(".xdg-app-builder", "downloads", sha256)
+                finaldir = os.path.join(".flatpak-builder", "downloads", sha256)
                 if not os.path.exists(finaldir):
                     os.makedirs(finaldir)
                 shutil.move(destfilename, os.path.join(finaldir, filename))
