@@ -10,5 +10,8 @@ fetch:
 repo:
 	ostree init --mode=archive-z2 --repo=repo
 
+check:
+	@json-glib-validate *.json
+
 clean:
 	@rm -rf sdk
