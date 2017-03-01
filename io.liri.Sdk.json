@@ -45,6 +45,52 @@
     "metadata-platform": "metadata.platform",
     "modules": [
         {
+            "name": "alsa-lib",
+            "sources": [
+                {
+                    "branch": "v1.1.2",
+                    "type": "git",
+                    "url": "git://git.alsa-project.org/alsa-lib.git"
+                },
+                {
+                    "commands": [
+                        "libtoolize --force --copy --automake",
+                        "aclocal",
+                        "autoheader",
+                        "automake --foreign --copy --add-missing",
+                        "autoconf"
+                    ],
+                    "type": "shell"
+                }
+            ]
+        },
+        {
+            "make-args": [
+                "SHARED=yes",
+                "ZLIB=no",
+                "PREFIX=/usr"
+            ],
+            "name": "pciutils",
+            "no-autogen": true,
+            "post-install": [
+                "make install-pcilib",
+                "make install-lib"
+            ],
+            "sources": [
+                {
+                    "branch": "v3.5.2",
+                    "type": "git",
+                    "url": "https://kernel.googlesource.com/pub/scm/utils/pciutils/pciutils"
+                },
+                {
+                    "commands": [
+                        "sed -i 's@PREFIX=/usr/local@PREFIX=/usr@' Makefile"
+                    ],
+                    "type": "shell"
+                }
+            ]
+        },
+        {
             "cleanup-platform": [
                 "/bin",
                 "/mkspecs"
