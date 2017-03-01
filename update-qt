@@ -26,16 +26,17 @@ if __name__ == "__main__":
         print("Usage: update-qt [version]", file=sys.stderr)
         sys.exit(1)
 
-    m = re.search(r'^(\d+\.\d+)\.\d+(-(?:alpha|beta|rc))*', version)
-    if m:
-        major = m.group(1)
-        if m.group(2):
-            download_url = "http://download.qt.io/development_releases/qt/%s/%s/submodules" % (major, version)
+    if not version.startswith("v"):
+        m = re.search(r'^(\d+\.\d+)\.\d+(-(?:alpha|beta|rc))*', version)
+        if m:
+            major = m.group(1)
+            if m.group(2):
+                download_url = "http://download.qt.io/development_releases/qt/%s/%s/submodules" % (major, version)
+            else:
+                download_url = "http://download.qt.io/official_releases/qt/%s/%s/submodules" % (major, version)
         else:
-            download_url = "http://download.qt.io/official_releases/qt/%s/%s/submodules" % (major, version)
-    else:
-        print("Wrong version specified, use the MAJOR.MINOR.PATCHLEVEL format", file=sys.stderr)
-        sys.exit(1)
+            print("Wrong version specified, use the MAJOR.MINOR.PATCHLEVEL format", file=sys.stderr)
+            sys.exit(1)
 
     fp = open("io.liri.Sdk.json", "r")
     data = json.loads(fp.read())
@@ -44,19 +45,27 @@ if __name__ == "__main__":
             m = re.search(r'qt5-(.+)', module["name"])
             if m:
                 module_name = m.group(1)
-                filename = "%s-opensource-src-%s.tar.xz" % (module_name, version)
 
-                destfilename, sha256 = download(download_url + "/" + filename, filename)
-                finaldir = os.path.join(".flatpak-builder", "downloads", sha256)
-                if not os.path.exists(finaldir):
-                    os.makedirs(finaldir)
-                shutil.move(destfilename, os.path.join(finaldir, filename))
+                if version.startswith("v"):
+                    module["sources"][0] = {
+                        "type": "git",
+                        "url": "git://code.qt.io/qt/%s.git" % module_name,
+                        "branch": version
+                    }
+                else:
+                    filename = "%s-opensource-src-%s.tar.xz" % (module_name, version)
 
-                module["sources"][0] = {
-                    "type": "archive",
-                    "url": download_url + "/" + filename,
-                    "sha256": sha256
-                }
+                    destfilename, sha256 = download(download_url + "/" + filename, filename)
+                    finaldir = os.path.join(".flatpak-builder", "downloads", sha256)
+                    if not os.path.exists(finaldir):
+                        os.makedirs(finaldir)
+                    shutil.move(destfilename, os.path.join(finaldir, filename))
+
+                    module["sources"][0] = {
+                        "type": "archive",
+                        "url": download_url + "/" + filename,
+                        "sha256": sha256
+                    }
             else:
                 print("Failed to parse module name for %s" % module["name"], file=sys.stderr)
                 sys.exit(1)
