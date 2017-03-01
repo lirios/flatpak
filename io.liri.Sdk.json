@@ -167,7 +167,10 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "config-opts": [
                 "-confirm-license",
                 "-opensource",
@@ -205,20 +208,23 @@
             "name": "qt5-qtbase",
             "sources": [
                 {
-                    "sha256": "51902393deff832593cd28d8d9780f055bc77726c5bdb5fce1dec2b30500b806",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtbase-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtbase.git"
                 }
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtsvg",
             "sources": [
                 {
-                    "sha256": "e43968fd547267afcc49692f4516daa3a7967c706a9dcaf81d87b758336cfe32",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtsvg-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtsvg.git"
                 },
                 {
                     "commands": [
@@ -230,13 +236,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtxmlpatterns",
             "sources": [
                 {
-                    "sha256": "a8c363e1b8c002b9d6934fac1f787020b8efcc1f9cc5233de881557600d1fe33",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtxmlpatterns-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtxmlpatterns.git"
                 },
                 {
                     "commands": [
@@ -248,13 +257,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtdeclarative",
             "sources": [
                 {
-                    "sha256": "084ecce310af7f1cd169fffada6660bd7fa71af531c9bb8f8b093e4bbcd6755f",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtdeclarative-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtdeclarative.git"
                 },
                 {
                     "commands": [
@@ -266,13 +278,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtgraphicaleffects",
             "sources": [
                 {
-                    "sha256": "901285c7de632cce74223d588e320d6848a46a653c1647e23a325b06612ad4ac",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtgraphicaleffects-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtgraphicaleffects.git"
                 },
                 {
                     "commands": [
@@ -284,13 +299,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtquickcontrols",
             "sources": [
                 {
-                    "sha256": "ee02c69a9bcd9fb13d0566e2a4f7c86911c00ef627b8a5afdc526a1d3186fd64",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtquickcontrols-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtquickcontrols.git"
                 },
                 {
                     "commands": [
@@ -302,13 +320,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtquickcontrols2",
             "sources": [
                 {
-                    "sha256": "a666ad670f85e1feddbf6aa8718b5bd362ad7f3bf650e77e7f65cdde211fccfe",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtquickcontrols2-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtquickcontrols2.git"
                 },
                 {
                     "commands": [
@@ -320,13 +341,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtmultimedia",
             "sources": [
                 {
-                    "sha256": "d4d5fde798863348beb1fa5fa24cb18a9d53af7d341f065474548fa92a8d7276",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtmultimedia-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtmultimedia.git"
                 },
                 {
                     "commands": [
@@ -338,13 +362,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qttools",
             "sources": [
                 {
-                    "sha256": "f12ed323845d3836a9dc5361197d150f226cd67189013feb4e59eb7ffac56a53",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qttools-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qttools.git"
                 },
                 {
                     "commands": [
@@ -356,13 +383,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtimageformats",
             "sources": [
                 {
-                    "sha256": "005f51eef0cfff4bbc343eb4a4b1af36e6614ba55784d64e44b4b3174e1e7690",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtimageformats-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtimageformats.git"
                 },
                 {
                     "commands": [
@@ -374,13 +404,16 @@
             ]
         },
         {
-            "cleanup-platform": [ "/bin", "/mkspecs" ],
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtwayland",
             "sources": [
                 {
-                    "sha256": "89c8ae5ef2e21f79846a57ef9114b93cbd9e898055ae3d2786768c30f9936ca1",
-                    "type": "archive",
-                    "url": "http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtwayland-opensource-src-5.6.0-rc.tar.xz"
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtwayland.git"
                 },
                 {
                     "commands": [
