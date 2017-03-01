@@ -41,6 +41,7 @@
     ],
     "id": "io.liri.Sdk",
     "id-platform": "io.liri.Platform",
+    "initial-debug": "org.freedesktop.Debug",
     "metadata": "metadata.sdk",
     "metadata-platform": "metadata.platform",
     "modules": [
@@ -451,10 +452,9 @@
         "org.freedesktop.Platform.Locale"
     ],
     "runtime": "org.freedesktop.Platform",
-    "runtime-version": "master",
+    "runtime-version": "1.4",
     "sdk": "org.freedesktop.Sdk",
     "sdk-extensions": [
-        "org.freedesktop.Sdk.Debug",
         "org.freedesktop.Sdk.Locale"
     ],
     "writable-sdk": true
