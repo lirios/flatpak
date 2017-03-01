@@ -435,6 +435,16 @@
                     "type": "script"
                 }
             ]
+        },
+        {
+            "cmake": true,
+            "name": "flatpak-platform-plugin",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://anongit.kde.org/flatpak-platform-plugin.git"
+                }
+            ]
         }
     ],
     "platform-extensions": [
