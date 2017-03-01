@@ -429,6 +429,10 @@
                     "url": "git://code.qt.io/qt/qtwebengine.git"
                 },
                 {
+                    "path": "qtwebengine-no-udev.patch",
+                    "type": "patch"
+                },
+                {
                     "commands": [
                         "qmake"
                     ],
