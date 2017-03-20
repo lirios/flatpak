@@ -4,12 +4,10 @@ ARGS="--user"
 FREEDESKTOP_SDK_VERSION="1.6"
 
 all: $(REPO)/config io.liri.Sdk.json
-	@rm -rf $(SDK)
-	flatpak-builder --ccache --build-only --disable-updates --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
+	flatpak-builder --force-clean --ccache --build-only --disable-updates --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
 
 update: $(REPO)/config io.liri.Sdk.json
-	@rm -rf $(SDK)
-	flatpak-builder --ccache --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
+	flatpak-builder --force-clean --ccache --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
 
 fetch:
 	flatpak-builder --download-only --disable-updates $(SDK) io.liri.Sdk.json
