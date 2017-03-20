@@ -92,6 +92,22 @@
             ]
         },
         {
+            "build-options": {
+                "arch": {
+                    "arm": {
+                        "config-opts": [
+                            "-opengl",
+                            "es2"
+                        ]
+                    },
+                    "i386": {
+                        "config-opts": [
+                            "-opengl",
+                            "desktop"
+                        ]
+                    }
+                }
+            },
             "cleanup-platform": [
                 "/bin",
                 "/mkspecs"
@@ -117,12 +133,11 @@
                 "-dbus-linked",
                 "-fontconfig",
                 "-glib",
-                "-iconv",
-                "-icu",
                 "-openssl-linked",
                 "-no-pch",
                 "-no-rpath",
                 "-no-separate-debug-info",
+                "-no-use-gold-linker",
                 "-reduce-relocations",
                 "-no-directfb",
                 "-no-linuxfb",
