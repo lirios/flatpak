@@ -113,7 +113,6 @@
                 "tests",
                 "-system-harfbuzz",
                 "-system-sqlite",
-                "-no-alsa",
                 "-accessibility",
                 "-dbus-linked",
                 "-fontconfig",
