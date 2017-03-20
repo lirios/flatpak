@@ -1,7 +1,7 @@
 REPO=repo
 SDK=sdk
 ARGS="--user"
-FREEDESKTOP_SDK_VERSION="1.4"
+FREEDESKTOP_SDK_VERSION="1.6"
 
 all: $(REPO)/config io.liri.Sdk.json
 	@rm -rf $(SDK)
