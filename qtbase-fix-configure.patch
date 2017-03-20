@@ -1,0 +1,32 @@
+commit 342691b80294f8096dd383f9a0a7b4488f40728e
+Author:     Oswald Buddenhagen <oswald.buddenhagen@qt.io>
+AuthorDate: Thu Jan 5 14:28:41 2017 +0100
+Commit:     Oswald Buddenhagen <oswald.buddenhagen@qt.io>
+CommitDate: Fri Jan 6 20:10:56 2017 +0000
+
+    fix configure --opt=val syntax
+    
+    the second dash would end up in the option name, which made it obviously
+    unrecognizable.
+    but the second dash isn't optional in the first place (as evidenced one
+    line up), so remove the question marks.
+    
+    Task-number: QTBUG-57908
+    Change-Id: I6622fef7d11d7b3c485f16698349d1912037a41e
+    Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+
+diff --git a/mkspecs/features/qt_configure.prf b/mkspecs/features/qt_configure.prf
+index 3adefb743e..a0948dad86 100644
+--- a/mkspecs/features/qt_configure.prf
++++ b/mkspecs/features/qt_configure.prf
+@@ -241,8 +241,8 @@ defineTest(qtConfParseCommandLine) {
+             opt = $$replace(c, "^--?(disable|no)-(.*)", "\\2")
+             val = no
+         } else: contains(c, "^--([^=]+)=(.*)") {
+-            opt = $$replace(c, "^--?([^=]+)=(.*)", "\\1")
+-            val = $$replace(c, "^--?([^=]+)=(.*)", "\\2")
++            opt = $$replace(c, "^--([^=]+)=(.*)", "\\1")
++            val = $$replace(c, "^--([^=]+)=(.*)", "\\2")
+         } else: contains(c, "^--(.*)") {
+             opt = $$replace(c, "^--(.*)", "\\1")
+             val = yes
