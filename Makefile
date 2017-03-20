@@ -32,3 +32,5 @@ check:
 
 clean:
 	@rm -rf $(SDK) .flatpak-builder
+
+.PHONY: fetch export remotes deps check clean
