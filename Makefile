@@ -14,6 +14,9 @@ update: $(REPO)/config io.liri.Sdk.json
 fetch:
 	flatpak-builder --download-only --disable-updates $(SDK) io.liri.Sdk.json
 
+export:
+	flatpak build-update-repo $(REPO) ${EXPORT_ARGS}
+
 $(REPO)/config:
 	ostree init --mode=archive-z2 --repo=$(REPO)
 

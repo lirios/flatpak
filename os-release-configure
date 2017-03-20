@@ -1,0 +1,17 @@
+#!/bin/sh
+
+cat <<EOF > Makefile
+all:
+
+install:
+	mkdir -p ${DESTDIR}/usr/lib
+	install os-release ${DESTDIR}/usr/lib
+	mkdir -p ${DESTDIR}/usr/share/appdata
+	mkdir -p ${DESTDIR}/etc
+	install issue ${DESTDIR}/etc
+	install issue.net ${DESTDIR}/etc
+	install io.liri.Platform.appdata.xml ${DESTDIR}/usr/share/appdata
+	install io.liri.Sdk.appdata.xml ${DESTDIR}/usr/share/appdata
+	appstream-compose --basename=io.liri.Platform --prefix=/usr --origin=flatpak io.liri.Platform
+	appstream-compose --basename=io.liri.Sdk --prefix=/usr --origin=flatpak io.liri.Sdk
+EOF

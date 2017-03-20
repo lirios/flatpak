@@ -513,6 +513,36 @@
                     "type": "shell"
                 }
             ]
+        },
+        {
+            "name": "os-release",
+            "sources": [
+                {
+                    "path": "os-release",
+                    "type": "file"
+                },
+                {
+                    "path": "issue",
+                    "type": "file"
+                },
+                {
+                    "path": "issue.net",
+                    "type": "file"
+                },
+                {
+                    "path": "io.liri.Sdk.appdata.xml",
+                    "type": "file"
+                },
+                {
+                    "path": "io.liri.Platform.appdata.xml",
+                    "type": "file"
+                },
+                {
+                    "dest-filename": "configure",
+                    "path": "os-release-configure",
+                    "type": "file"
+                }
+            ]
         }
     ],
     "platform-extensions": [

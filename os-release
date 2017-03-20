@@ -1,0 +1,4 @@
+NAME=Liri
+VERSION=master (Flatpak runtime)
+VERSION_ID=master
+ID=io.liri.Platform
