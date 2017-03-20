@@ -22,8 +22,8 @@ remotes:
 	flatpak remote-add $(ARGS) gnome --from https://sdk.gnome.org/gnome.flatpakrepo --if-not-exists
 
 deps:
-	flatpak install $(ARGS) gnome org.freedesktop.Sdk.Locale $(FREEDESKTOP_SDK_VERSION); true
 	flatpak install $(ARGS) gnome org.freedesktop.Platform.Locale $(FREEDESKTOP_SDK_VERSION); true
+	flatpak install $(ARGS) gnome org.freedesktop.Sdk.Locale $(FREEDESKTOP_SDK_VERSION); true
 	flatpak install $(ARGS) gnome org.freedesktop.Platform $(FREEDESKTOP_SDK_VERSION); true
 	flatpak install $(ARGS) gnome org.freedesktop.Sdk $(FREEDESKTOP_SDK_VERSION); true
 
