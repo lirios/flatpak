@@ -460,6 +460,24 @@
             ]
         },
         {
+            "cleanup-platform": [
+                "*"
+            ],
+            "cmake": true,
+            "config-opts": [
+                "-DENABLE_TESTING=OFF",
+                "-DCMAKE_INSTALL_LIBDIR=lib"
+            ],
+            "name": "extra-cmake-modules",
+            "sources": [
+                {
+                    "branch": "v5.31.0",
+                    "type": "git",
+                    "url": "git://anongit.kde.org/extra-cmake-modules.git"
+                }
+            ]
+        },
+        {
             "cmake": true,
             "name": "flatpak-platform-plugin",
             "sources": [
