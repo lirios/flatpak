@@ -468,6 +468,33 @@
                     "url": "git://anongit.kde.org/flatpak-platform-plugin.git"
                 }
             ]
+        },
+        {
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
+            "name": "fluid",
+            "sources": [
+                {
+                    "branch": "develop",
+                    "type": "git",
+                    "url": "git://github.com/lirios/fluid.git"
+                },
+                {
+                    "commands": [
+                        "qmake CONFIG+=use_qt_paths"
+                    ],
+                    "dest-filename": "configure",
+                    "type": "script"
+                },
+                {
+                    "commands": [
+                        "./scripts/fetch_icons.sh"
+                    ],
+                    "type": "shell"
+                }
+            ]
         }
     ],
     "platform-extensions": [
