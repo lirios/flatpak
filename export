@@ -2,9 +2,11 @@
 
 set -e
 
-remoteurl=liri@liri.io:/srv/www/repo.liri.io/flatpak/platform/
+remote=liri@liri.io
+basedir=/srv/www/repo.liri.io/flatpak
 
 #make EXPORT_ARGS="--generate-static-deltas" all export
 make all export
 
-rsync -a --progress repo/ $remoteurl
+./rsync-repos --src repo/ --dest ${remote}:${basedir}/platform/
+scp liri.flatpakrepo ${remote}:${basedir}
