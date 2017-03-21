@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+gpgkey=71B9937D
+
+make EXPORT_ARGS="--gpg-sign=$gpgkey" all #--generate-static-deltas
+make EXPORT_ARGS="--gpg-sign=$gpgkey" export #--generate-static-deltas
