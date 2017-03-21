@@ -2,18 +2,19 @@ REPO=repo
 SDK=sdk
 ARGS="--user"
 FREEDESKTOP_SDK_VERSION="1.6"
+GPGKEY = "71B9937D"
 
 all: $(REPO)/config io.liri.Sdk.json
-	flatpak-builder --force-clean --ccache --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
+	flatpak-builder --force-clean --ccache --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" --gpg-sign=$(GPGKEY) ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
 
 build: $(REPO)/config io.liri.Sdk.json
-	flatpak-builder --force-clean --ccache --build-only --disable-updates --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
+	flatpak-builder --force-clean --ccache --build-only --disable-updates --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" $(SDK) io.liri.Sdk.json
 
 fetch:
 	flatpak-builder --download-only --disable-updates $(SDK) io.liri.Sdk.json
 
 export:
-	flatpak build-update-repo $(REPO) ${EXPORT_ARGS}
+	flatpak build-update-repo $(REPO) --gpg-sign=$(GPGKEY) ${EXPORT_ARGS}
 
 $(REPO)/config:
 	ostree init --mode=archive-z2 --repo=$(REPO)

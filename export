@@ -2,7 +2,9 @@
 
 set -e
 
-gpgkey=71B9937D
+remoteurl=liri@liri.io:/srv/www/repo.liri.io/flatpak/platform/
 
-make EXPORT_ARGS="--gpg-sign=$gpgkey" all #--generate-static-deltas
-make EXPORT_ARGS="--gpg-sign=$gpgkey" export #--generate-static-deltas
+#make EXPORT_ARGS="--generate-static-deltas" all export
+make all export
+
+rsync -a --progress repo/ $remoteurl
