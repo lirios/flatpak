@@ -1,5 +1,5 @@
 {
-    "branch": "master",
+    "branch": "@@RUNTIME_BRANCH@@",
     "build-options": {
         "cflags": "-O2 -g -fstack-protector-strong -D_FORTIFY_SOURCE=2",
         "cxxflags": "-O2 -g -fstack-protector-strong -D_FORTIFY_SOURCE=2",
@@ -43,7 +43,7 @@
     "finish-args": [
         "--extension=org.freedesktop.Platform.GL=directory=lib/GL",
         "--extension=org.freedesktop.Platform.GL=version=1.4",
-        "--extension=org.freedesktop.Platform.GL=versions=1.6;1.4",
+        "--extension=org.freedesktop.Platform.GL=versions=@@FREEDESKTOP_VERSION@@;1.4",
         "--extension=org.freedesktop.Platform.GL=subdirectories=true",
         "--extension=org.freedesktop.Platform.GL=no-autodownload=true",
         "--extension=org.freedesktop.Platform.GL=autodelete=false",
@@ -52,16 +52,16 @@
         "--extension=org.freedesktop.Platform.GL=download-if=active-gl-driver",
         "--extension=org.freedesktop.Platform.GL=enable-if=active-gl-driver",
         "--extension=org.freedesktop.Platform.Timezones=directory=share/zoneinfo",
-        "--extension=org.freedesktop.Platform.Timezones=version=1.6",
+        "--extension=org.freedesktop.Platform.Timezones=version=@@FREEDESKTOP_VERSION@@",
         "--extension=org.freedesktop.Platform.GStreamer=directory=lib/extensions/gstreamer-1.0",
-        "--extension=org.freedesktop.Platform.GStreamer=version=1.6",
+        "--extension=org.freedesktop.Platform.GStreamer=version=@@FREEDESKTOP_VERSION@@",
         "--extension=org.freedesktop.Platform.GStreamer=subdirectories",
         "--env=GI_TYPELIB_PATH=/app/lib/girepository-1.0",
         "--env=GST_PLUGIN_SYSTEM_PATH=/app/lib/gstreamer-1.0:/usr/lib/extensions/gstreamer-1.0:/usr/lib/gstreamer-1.0",
         "--env=QT_PLUGIN_PATH=/app/lib64/plugins:/app/lib/plugins",
         "--env=QML2_IMPORT_PATH=/app/lib64/qml:/app/lib/qml",
-        "--sdk=io.liri.Sdk//master",
-        "--runtime=io.liri.Platform//master"
+        "--sdk=io.liri.Sdk//@@RUNTIME_BRANCH@@",
+        "--runtime=io.liri.Platform//@@RUNTIME_BRANCH@@"
     ],
     "id": "io.liri.Sdk",
     "id-platform": "io.liri.Platform",
@@ -545,7 +545,7 @@
         "org.freedesktop.Platform.Locale"
     ],
     "runtime": "org.freedesktop.Platform",
-    "runtime-version": "1.6",
+    "runtime-version": "@@FREEDESKTOP_VERSION@@",
     "sdk": "org.freedesktop.Sdk",
     "sdk-extensions": [
         "org.freedesktop.Sdk.Locale"

@@ -1,0 +1,4 @@
+NAME=Liri
+VERSION=@@RUNTIME_BRANCH@@ (Flatpak runtime)
+VERSION_ID=@@RUNTIME_BRANCH@@
+ID=io.liri.Platform

@@ -1,3 +1,9 @@
 .flatpak-builder/
 repo/
 sdk/
+io.liri.Sdk.json
+os-release
+issue
+issue.net
+io.liri.Sdk.appdata.xml
+io.liri.Platform.appdata.xml
