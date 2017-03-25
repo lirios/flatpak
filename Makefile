@@ -38,11 +38,11 @@ endef
 
 all: $(REPO)/config $(patsubst %,%.in,$(SUBST_FILES))
 	$(call subst-metadata)
-	flatpak-builder --force-clean --ccache --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" --gpg-sign=$(GPGKEY) ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
+	flatpak-builder --force-clean --ccache --require-changes --repo=$(REPO) --arch=$(ARCH) --subject="Build of io.liri.Sdk, `date`" --gpg-sign=$(GPGKEY) ${EXPORT_ARGS} $(SDK) io.liri.Sdk.json
 
 build: $(REPO)/config $(patsubst %,%.in,$(SUBST_FILES))
 	$(call subst-metadata)
-	flatpak-builder --force-clean --ccache --build-only --disable-updates --require-changes --repo=$(REPO) --subject="Build of io.liri.Sdk, `date`" $(SDK) io.liri.Sdk.json
+	flatpak-builder --force-clean --ccache --build-only --disable-updates --require-changes --repo=$(REPO) --arch=$(ARCH) --subject="Build of io.liri.Sdk, `date`" $(SDK) io.liri.Sdk.json
 
 fetch:
 	flatpak-builder --download-only --disable-updates $(SDK) io.liri.Sdk.json
