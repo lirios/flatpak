@@ -19,4 +19,4 @@ make build
 
 ## Versioning
 
-Nightly builds result in the `master` OSTree branch while stable builds are versioned.
+Nightly builds result in the `develop` OSTree branch while stable builds are versioned.
