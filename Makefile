@@ -48,7 +48,7 @@ fetch:
 	flatpak-builder --download-only --disable-updates $(SDK) io.liri.Sdk.json
 
 export:
-	flatpak build-update-repo $(REPO) --gpg-sign=$(GPGKEY) ${EXPORT_ARGS}
+	flatpak build-update-repo $(REPO) --gpg-sign=$(GPGKEY) --prune --prune-depth=20 ${EXPORT_ARGS}
 
 $(REPO)/config:
 	ostree init --mode=archive-z2 --repo=$(REPO)
