@@ -552,7 +552,7 @@
         {
             "cleanup-platform": [
                 "/bin",
-                "/mkspecs"
+                "/share/qbs"
             ],
             "name": "fluid",
             "sources": [
@@ -562,17 +562,16 @@
                     "url": "git://github.com/lirios/fluid.git"
                 },
                 {
-                    "commands": [
-                        "qmake CONFIG+=use_qt_paths"
-                    ],
-                    "dest-filename": "configure",
-                    "type": "script"
+                    "dest-filename": "actual-autogen.sh",
+                    "path": "qbs-autogen",
+                    "type": "file"
                 },
                 {
                     "commands": [
-                        "./scripts/fetch_icons.sh"
+                        "./actual-autogen.sh lirideployment.libDir:lib/qml"
                     ],
-                    "type": "shell"
+                    "dest-filename": "autogen.sh",
+                    "type": "script"
                 }
             ]
         },
