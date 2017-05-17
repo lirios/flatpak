@@ -250,6 +250,27 @@
                 "/bin",
                 "/mkspecs"
             ],
+            "name": "qt5-qtscript",
+            "sources": [
+                {
+                    "branch": "v5.8.0",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt/qtscript.git"
+                },
+                {
+                    "commands": [
+                        "qmake"
+                    ],
+                    "dest-filename": "configure",
+                    "type": "script"
+                }
+            ]
+        },
+        {
+            "cleanup-platform": [
+                "/bin",
+                "/mkspecs"
+            ],
             "name": "qt5-qtgraphicaleffects",
             "sources": [
                 {
