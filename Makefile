@@ -19,7 +19,7 @@ GPGKEY = 71B9937D
 # RUNTIME_BRANCH:       The version (branch) of platform and SDK to produce
 # FREEDESKTOP_VERSION:  The org.freedesktop.Platform and org.freedesktop.Sdk version to build against
 #
-RUNTIME_BRANCH = develop
+RUNTIME_BRANCH = master
 FREEDESKTOP_VERSION = 1.6
 
 SUBST_FILES=io.liri.Sdk.json os-release issue issue.net io.liri.Sdk.appdata.xml io.liri.Platform.appdata.xml
