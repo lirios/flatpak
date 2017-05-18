@@ -505,26 +505,6 @@
             "cleanup-platform": [
                 "*"
             ],
-            "name": "qbs",
-            "sources": [
-                {
-                    "branch": "v1.7.2",
-                    "type": "git",
-                    "url": "git://code.qt.io/qt-labs/qbs.git"
-                },
-                {
-                    "commands": [
-                        "qmake QBS_INSTALL_PREFIX=/usr CONFIG+=qbs_enable_project_file_updates qbs.pro"
-                    ],
-                    "dest-filename": "configure",
-                    "type": "script"
-                }
-            ]
-        },
-        {
-            "cleanup-platform": [
-                "*"
-            ],
             "cmake": true,
             "config-opts": [
                 "-DENABLE_TESTING=OFF",
@@ -546,6 +526,26 @@
                 {
                     "type": "git",
                     "url": "git://anongit.kde.org/flatpak-platform-plugin.git"
+                }
+            ]
+        },
+        {
+            "cleanup-platform": [
+                "*"
+            ],
+            "name": "qbs",
+            "sources": [
+                {
+                    "branch": "v1.7.2",
+                    "type": "git",
+                    "url": "git://code.qt.io/qt-labs/qbs.git"
+                },
+                {
+                    "commands": [
+                        "qmake QBS_INSTALL_PREFIX=/usr CONFIG+=qbs_enable_project_file_updates qbs.pro"
+                    ],
+                    "dest-filename": "configure",
+                    "type": "script"
                 }
             ]
         },
