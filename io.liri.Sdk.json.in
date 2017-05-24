@@ -541,6 +541,10 @@
                     "url": "git://code.qt.io/qt-labs/qbs.git"
                 },
                 {
+                    "path": "qbs-fileinfo-exists.patch",
+                    "type": "patch"
+                },
+                {
                     "commands": [
                         "qmake QBS_INSTALL_PREFIX=/usr CONFIG+=qbs_enable_project_file_updates qbs.pro"
                     ],
@@ -552,7 +556,7 @@
         {
             "cleanup-platform": [
                 "/bin",
-                "/mkspecs"
+                "/share/qbs"
             ],
             "name": "fluid",
             "sources": [
@@ -562,10 +566,15 @@
                     "url": "git://github.com/lirios/fluid.git"
                 },
                 {
+                    "dest-filename": "actual-autogen.sh",
+                    "path": "qbs-autogen",
+                    "type": "file"
+                },
+                {
                     "commands": [
-                        "qmake CONFIG+=install_under_qt"
+                        "./actual-autogen.sh lirideployment.libDir:lib/qml"
                     ],
-                    "dest-filename": "configure",
+                    "dest-filename": "autogen.sh",
                     "type": "script"
                 }
             ]
