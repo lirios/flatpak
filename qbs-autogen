@@ -12,8 +12,8 @@ chmod 755 configure
 
 cat > Makefile <<EOF
 all:
-	qbs build --settings-dir .qbs-settings -d build --command-echo-mode command-line --no-install profile:qt5 qbs.installRoot:/usr $*
+	qbs build --settings-dir .qbs-settings -d build --command-echo-mode command-line --no-install profile:qt5 qbs.installRoot:/ qbs.installPrefix:usr $*
 
 install:
-	qbs install --settings-dir .qbs-settings -d build --no-build profile:qt5 qbs.installRoot:/usr $*
+	qbs install --settings-dir .qbs-settings -d build --no-build profile:qt5 qbs.installRoot:/ qbs.installPrefix:usr $*
 EOF
