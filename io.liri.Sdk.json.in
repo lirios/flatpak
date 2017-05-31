@@ -513,7 +513,7 @@
             "cleanup-platform": [
                 "*"
             ],
-            "cmake": true,
+            "buildsystem": "cmake-ninja",
             "config-opts": [
                 "-DENABLE_TESTING=OFF",
                 "-DCMAKE_INSTALL_LIBDIR=lib"
@@ -528,7 +528,7 @@
             ]
         },
         {
-            "cmake": true,
+            "buildsystem": "cmake-ninja",
             "name": "flatpak-platform-plugin",
             "sources": [
                 {
