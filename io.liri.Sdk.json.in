@@ -184,7 +184,7 @@
             "name": "qt5-qtbase",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtbase.git"
                 },
@@ -210,7 +210,7 @@
             "name": "qt5-qtsvg",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtsvg.git"
                 },
@@ -231,7 +231,7 @@
             "name": "qt5-qtxmlpatterns",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtxmlpatterns.git"
                 },
@@ -252,7 +252,7 @@
             "name": "qt5-qtdeclarative",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtdeclarative.git"
                 },
@@ -273,7 +273,7 @@
             "name": "qt5-qtscript",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtscript.git"
                 },
@@ -294,7 +294,7 @@
             "name": "qt5-qtgraphicaleffects",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtgraphicaleffects.git"
                 },
@@ -315,7 +315,7 @@
             "name": "qt5-qtquickcontrols",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtquickcontrols.git"
                 },
@@ -336,7 +336,7 @@
             "name": "qt5-qtquickcontrols2",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtquickcontrols2.git"
                 },
@@ -357,7 +357,7 @@
             "name": "qt5-qtmultimedia",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtmultimedia.git"
                 },
@@ -378,7 +378,7 @@
             "name": "qt5-qttools",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qttools.git"
                 },
@@ -399,7 +399,7 @@
             "name": "qt5-qtimageformats",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtimageformats.git"
                 },
@@ -420,7 +420,7 @@
             "name": "qt5-qtwayland",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtwayland.git"
                 },
@@ -441,7 +441,7 @@
             "name": "qt5-qtsensors",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtsensors.git"
                 },
@@ -462,7 +462,7 @@
             "name": "qt5-qtlocation",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtlocation.git"
                 },
@@ -483,7 +483,7 @@
             "name": "qt5-qtwebchannel",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtwebchannel.git"
                 },
@@ -504,17 +504,13 @@
             "name": "qt5-qtwebengine",
             "sources": [
                 {
-                    "branch": "v5.8.0",
+                    "branch": "v5.9.0",
                     "type": "git",
                     "url": "git://code.qt.io/qt/qtwebengine.git"
                 },
                 {
-                    "path": "qtwebengine-no-udev.patch",
-                    "type": "patch"
-                },
-                {
                     "commands": [
-                        "qmake"
+                        "qmake WEBENGINE_CONFIG-=use_udev"
                     ],
                     "dest-filename": "configure",
                     "type": "script"
