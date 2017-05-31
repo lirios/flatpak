@@ -554,6 +554,11 @@
             ]
         },
         {
+            "buildsystem": "simple",
+            "build-commands": [
+                "./qbs-configure",
+                "./qbs-build qbs.buildVariant:debug qbs.installRoot:/ qbs.installPrefix:usr lirideployment.libDir:lib/qml"
+            ],
             "cleanup-platform": [
                 "/bin",
                 "/share/qbs"
@@ -566,16 +571,14 @@
                     "url": "git://github.com/lirios/fluid.git"
                 },
                 {
-                    "dest-filename": "actual-autogen.sh",
-                    "path": "qbs-autogen",
+                    "dest-filename": "qbs-configure",
+                    "path": "qbs-configure",
                     "type": "file"
                 },
                 {
-                    "commands": [
-                        "./actual-autogen.sh lirideployment.libDir:lib/qml"
-                    ],
-                    "dest-filename": "autogen.sh",
-                    "type": "script"
+                    "dest-filename": "qbs-build",
+                    "path": "qbs-build",
+                    "type": "file"
                 }
             ]
         },
