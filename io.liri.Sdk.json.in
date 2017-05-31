@@ -557,7 +557,7 @@
             "buildsystem": "simple",
             "build-commands": [
                 "./qbs-configure",
-                "./qbs-build qbs.buildVariant:debug qbs.installRoot:/ qbs.installPrefix:usr lirideployment.libDir:lib/qml"
+                "./qbs-build qbs.buildVariant:debug qbs.installRoot:/ qbs.installPrefix:usr"
             ],
             "cleanup-platform": [
                 "/bin",
