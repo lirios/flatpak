@@ -57,10 +57,10 @@ remotes:
 	flatpak remote-add $(ARGS) gnome --from https://sdk.gnome.org/gnome.flatpakrepo --if-not-exists
 
 deps:
-	flatpak install $(ARGS) gnome org.freedesktop.Platform.Locale $(FREEDESKTOP_VERSION); true
-	flatpak install $(ARGS) gnome org.freedesktop.Sdk.Locale $(FREEDESKTOP_VERSION); true
-	flatpak install $(ARGS) gnome org.freedesktop.Platform $(FREEDESKTOP_VERSION); true
-	flatpak install $(ARGS) gnome org.freedesktop.Sdk $(FREEDESKTOP_VERSION); true
+	flatpak update $(ARGS) org.freedesktop.Platform.Locale $(FREEDESKTOP_VERSION) || flatpak install $(ARGS) gnome org.freedesktop.Platform.Locale $(FREEDESKTOP_VERSION)
+	flatpak update $(ARGS) org.freedesktop.Sdk.Locale $(FREEDESKTOP_VERSION) || flatpak install $(ARGS) gnome org.freedesktop.Sdk.Locale $(FREEDESKTOP_VERSION)
+	flatpak update $(ARGS) org.freedesktop.Platform $(FREEDESKTOP_VERSION) || flatpak install $(ARGS) gnome org.freedesktop.Platform $(FREEDESKTOP_VERSION)
+	flatpak update $(ARGS) org.freedesktop.Sdk $(FREEDESKTOP_VERSION) || flatpak install $(ARGS) gnome org.freedesktop.Sdk $(FREEDESKTOP_VERSION)
 
 check: $(patsubst %,%.in,io.liri.Sdk.json)
 	@$(call subst-metadata)
