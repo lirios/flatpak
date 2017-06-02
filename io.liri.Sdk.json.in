@@ -172,6 +172,7 @@
                 "-fontconfig",
                 "-glib",
                 "-icu",
+                "-gtk",
                 "-openssl-linked",
                 "-no-pch",
                 "-no-rpath",
