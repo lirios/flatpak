@@ -2,9 +2,16 @@
 <component type="runtime">
   <id>io.liri.Sdk</id>
   <metadata_license>CC0</metadata_license>
-  <!-- FIXME -->
   <project_license>GPL-3.0+</project_license>
   <name>Liri Software Development Kit version @@RUNTIME_BRANCH@@</name>
   <summary>Tools and headers for developing applications using the Liri application platform</summary>
+  <description>
+    <p>
+      The Liri Sdk is the development runtime that you can use to produce
+      applications using the Liri Platform runtime. It contains everything
+      that is in the platform, plus build and debugging tools and headers
+      for the libraries.
+    </p>
+  </description>
   <url type="homepage">https://liri.io/</url>
 </component>
