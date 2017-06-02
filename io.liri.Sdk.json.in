@@ -148,7 +148,7 @@
             "config-opts": [
                 "-confirm-license",
                 "-opensource",
-                "-release",
+                "-debug",
                 "-shared",
                 "-archdatadir",
                 "/usr/lib/",
