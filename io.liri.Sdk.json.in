@@ -17,8 +17,7 @@
         "/share/gtk-doc",
         "/share/devhelp",
         "/lib/systemd",
-        "*.la",
-        "*.a"
+        "*.la"
     ],
     "cleanup-commands": [
         "touch -d @0 /usr/share/fonts",
@@ -32,7 +31,8 @@
         "/lib/cmake",
         "/lib/pkgconfig",
         "/share/gir-1.0",
-        "/share/vala"
+        "/share/vala",
+        "*.a"
     ],
     "cleanup-platform-commands": [
         "touch -d @0 /usr/share/fonts",
