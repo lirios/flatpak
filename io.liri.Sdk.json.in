@@ -171,6 +171,7 @@
                 "-dbus-linked",
                 "-fontconfig",
                 "-glib",
+                "-icu",
                 "-openssl-linked",
                 "-no-pch",
                 "-no-rpath",
