@@ -580,7 +580,7 @@
             "sources": [
                 {
                     "type": "git",
-                    "url": "git://code.qt.io/qt-labs/qbs.git",
+                    "url": "git://code.qt.io/qbs/qbs.git",
                     "branch": "v1.8.0"
                 },
                 {
