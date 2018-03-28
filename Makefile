@@ -11,7 +11,7 @@ SDK ?= sdk
 ARGS = "--user"
 
 # GPG key to sign commits
-GPGKEY = 71B9937D
+GPGKEY = 7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE
 
 #
 # SDK Versions setup here
@@ -21,6 +21,7 @@ GPGKEY = 71B9937D
 #
 RUNTIME_BRANCH = master
 FREEDESKTOP_VERSION = 1.6
+KDE_VERSION = 5.10
 
 SUBST_FILES=io.liri.Sdk.json os-release issue issue.net io.liri.Sdk.appdata.xml io.liri.Platform.appdata.xml
 define subst-metadata
@@ -31,6 +32,7 @@ define subst-metadata
 	      -e 's/@@RUNTIME_ARCH@@/${ARCH}/g' 				\
 	      -e 's/@@RUNTIME_BRANCH@@/${RUNTIME_BRANCH}/g' 			\
 	      -e 's/@@FREEDESKTOP_VERSION@@/${FREEDESKTOP_VERSION}/g' 		\
+	      -e 's/@@KDE_VERSION@@/${KDE_VERSION}/g' 				\
 	      $$file_source > $$file.tmp && mv $$file.tmp $$file || exit 1;	\
 	done
 	@echo "Done.";
@@ -47,6 +49,11 @@ build: $(REPO)/config $(patsubst %,%.in,$(SUBST_FILES))
 fetch:
 	flatpak-builder --download-only --disable-updates $(SDK) io.liri.Sdk.json
 
+gpgkey:
+	@rm -f key.gpg
+	gpg --output key.gpg --export $(GPGKEY)
+	base64 --wrap=0 < key.gpg > key.gpg.base64
+
 export:
 	flatpak build-update-repo $(REPO) --gpg-sign=$(GPGKEY) --prune --prune-depth=20 ${EXPORT_ARGS}
 
@@ -54,13 +61,13 @@ $(REPO)/config:
 	ostree init --mode=archive-z2 --repo=$(REPO)
 
 remotes:
-	flatpak remote-add $(ARGS) gnome --from https://sdk.gnome.org/gnome.flatpakrepo --if-not-exists
+	flatpak remote-add $(ARGS) flathub --from https://flathub.org/repo/flathub.flatpakrepo --if-not-exists
 
-deps:
-	flatpak update $(ARGS) org.freedesktop.Platform.Locale $(FREEDESKTOP_VERSION) || flatpak install $(ARGS) gnome org.freedesktop.Platform.Locale $(FREEDESKTOP_VERSION)
-	flatpak update $(ARGS) org.freedesktop.Sdk.Locale $(FREEDESKTOP_VERSION) || flatpak install $(ARGS) gnome org.freedesktop.Sdk.Locale $(FREEDESKTOP_VERSION)
-	flatpak update $(ARGS) org.freedesktop.Platform $(FREEDESKTOP_VERSION) || flatpak install $(ARGS) gnome org.freedesktop.Platform $(FREEDESKTOP_VERSION)
-	flatpak update $(ARGS) org.freedesktop.Sdk $(FREEDESKTOP_VERSION) || flatpak install $(ARGS) gnome org.freedesktop.Sdk $(FREEDESKTOP_VERSION)
+deps: remotes
+	flatpak update $(ARGS) org.kde.Platform.Locale $(KDE_VERSION) || flatpak install $(ARGS) flathub org.kde.Platform.Locale $(KDE_VERSION)
+	flatpak update $(ARGS) org.kde.Sdk.Locale $(KDE_VERSION) || flatpak install $(ARGS) flathub org.kde.Sdk.Locale $(KDE_VERSION)
+	flatpak update $(ARGS) org.kde.Platform $(KDE_VERSION) || flatpak install $(ARGS) flathub org.kde.Platform $(KDE_VERSION)
+	flatpak update $(ARGS) org.kde.Sdk $(KDE_VERSION) || flatpak install $(ARGS) flathub org.kde.Sdk $(KDE_VERSION)
 
 check: $(patsubst %,%.in,io.liri.Sdk.json)
 	@$(call subst-metadata)

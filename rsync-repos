@@ -40,7 +40,7 @@ RSYNC_ORDERING = [(OBJECTS_AND_DELTAS, ['--ignore-existing']),
                   (OBJECTS_AND_DELTAS, ['--ignore-existing', '--delete'])]
 
 for (paths, opts) in RSYNC_ORDERING:
-    argv = ['rsync', '-rlpt']
+    argv = ['rsync', '-rlpt', '--info=progress2']
     for path in paths:
         argv.append('--include=' + path)
     argv.extend(['--exclude=*', args.src, args.dest])
