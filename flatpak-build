@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# This file is part of Liri.
+#
+# Copyright (C) 2018 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+#
+# $BEGIN_LICENSE:GPL3+$
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $END_LICENSE$
+#
+
+from utilities import command, rsync
+
+import base64
+import datetime
+import os
+import json
+import yaml
+import shlex
+import shutil
+
+
+class Builder(object):
+    arch = None
+    metadata_file = None
+    metadata = None
+    current_path = os.path.abspath(os.path.dirname(__file__))
+    temp_path = '/tmp/liri-flatpak'
+
+    class Error(Exception):
+        pass
+
+    def prepare(self):
+        if self.metadata_file is None:
+            raise Builder.Error('Metadata file was not specified')
+        self.metadata = yaml.load(self.metadata_file.read())
+
+    def setup(self, echo=False):
+        self.prepare()
+        if self.metadata is None:
+            raise Builder.Error('Metadata was not loaded')
+
+    def build(self, repo, target, jobs=None, echo=False, **kwargs):
+        self.setup()
+
+    def export(self, repo, gpg_key, echo=False, **kwargs):
+        pass
+
+    def sync(self, repo, gpg_key, dest_url, echo=False, **kwargs):
+        repo_path = os.path.abspath(repo)
+        rsync(repo_path, dest_url)
+
+
+class RuntimeBuilder(Builder):
+    def setup(self, echo=True):
+        super(RuntimeBuilder, self).setup(echo=echo)
+
+        for runtime in self.metadata['runtimes']:
+            for remote_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('remotes', []):
+                if command(['flatpak', 'remote-add', '--user', remote_dep['name'], '--from', remote_dep['location'], '--if-not-exists'], echo=echo, output=echo).returncode != 0:
+                    raise Builder.Error('Failed to add %s remote' % remote_dep['name'])
+            for runtime_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('runtimes', []):
+                fullname = '%s//%s' % (runtime_dep['name'], runtime_dep['version'])
+                if command(['flatpak', 'update', '--user', '--runtime', fullname], echo=echo, output=echo).returncode != 0:
+                    if command(['flatpak', 'install', '--user', '--runtime', runtime_dep['remote'], fullname], echo=echo, output=echo).returncode != 0:
+                        raise Builder.Error('Failed to install or update {name} {version}'.format(runtime_dep))
+
+    def copy_files(self):
+        if os.path.exists(self.temp_path):
+            shutil.rmtree(self.temp_path)
+        os.makedirs(self.temp_path)
+        for dirname in ('templates', 'sources', 'patches'):
+            shutil.copytree(os.path.join(self.current_path, dirname), os.path.join(self.temp_path, dirname))
+
+    def build_runtime(self, runtime, repo_path, sdk_path, state_path, jobs=None, echo=True):
+        modules_list = []
+        for module in self.metadata['runtimes'][runtime].get('modules', []):
+            with open(os.path.join(self.current_path, module), 'r') as module_file:
+                module_text = module_file.read()
+                module_text = module_text.replace('@@RUNTIME_ARCH@', self.arch)
+                module_text = module_text.replace('@@RUNTIME_BRANCH@', self.metadata['runtimes'][runtime]['branch'])
+                module_text = module_text.replace('@@BASE_RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['base-runtime-branch'])
+                module_data = json.loads(module_text)
+                modules_list.append(module_data)
+
+        with open(os.path.join(self.current_path, 'templates/%s.json.in' % runtime), 'r') as template_file:
+            runtime_text = template_file.read()
+            runtime_text = runtime_text.replace('@@RUNTIME_ARCH@@', self.arch)
+            runtime_text = runtime_text.replace('@@RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['branch'])
+            runtime_text = runtime_text.replace('@@BASE_RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['base-runtime-branch'])
+            runtime_data = json.loads(runtime_text)
+            runtime_data['modules'] = modules_list
+
+            self.copy_files()
+
+            with open(os.path.join(self.temp_path, '%s.json' % runtime), 'w') as metadata_file:
+                metadata_file.write(json.dumps(runtime_data))
+            for appdata in self.metadata['runtimes'][runtime].get('appdata', []):
+                with open(os.path.join(self.temp_path, appdata), 'w') as appdata_file:
+                    f = open(os.path.join(self.current_path, 'templates/%s.in' % appdata), 'r')
+                    contents = f.read()
+                    contents = contents.replace('@@RUNTIME_ARCH@@', self.arch)
+                    contents = contents.replace('@@RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['branch'])
+                    f.close()
+                    appdata_file.write(contents)
+
+            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            subject = 'Build of %s at %s' % (runtime, now)
+
+            argv = ['flatpak-builder', '--ccache', '--force-clean', '--require-changes',
+                    '--repo=' + repo_path, '--state-dir=' + state_path,
+                    '--arch=' + self.arch, '--subject="%s"' % subject,
+                    sdk_path, os.path.join(self.temp_path, runtime + '.json')]
+            if jobs is not None and isinstance(jobs, int):
+                argv.extend(['--jobs', str(jobs)])
+            result = command(argv, echo=echo, output=echo)
+            if result.returncode != 0:
+                raise Builder.Error('Build failed')
+
+    def build(self, repo, target, jobs=None, echo=True, **kwargs):
+        if repo is None:
+            raise Builder.Error('Specify OSTree repository path')
+
+        self.setup()
+
+        repo_path = os.path.abspath(repo)
+        sdk_path = os.path.join(self.current_path, 'sdk')
+        state_path = os.path.join(self.current_path, '.flatpak-builder')
+
+        if target is None:
+            for runtime in self.metadata['runtimes']:
+                self.build_runtime(runtime, repo_path, sdk_path, state_path, jobs=jobs, echo=echo)
+        else:
+            if target not in self.metadata['runtimes']:
+                raise Builder.Error('Unknown runtime ' + target)
+            self.build_runtime(target, repo_path, sdk_path, state_path, jobs=jobs, echo=echo)
+
+    def export(self, repo, gpg_key, echo=True, **kwargs):
+        repo_path = os.path.abspath(repo)
+
+        if command(['flatpak', 'build-update-repo', repo_path, '--gpg-sign=' + gpg_key, '--prune', '--prune-depth=20'], echo=echo, output=echo).returncode != 0:
+            raise Builder.Error('Failed to export OSTree repository')
+
+    def sync_flatpakrepo(self, gpg_key, dest_url, echo=True):
+        self.copy_files()
+
+        # Encode GPG key to base64
+        gpgdata_path = os.path.join(self.temp_path, 'key.pgp')
+        if command(['gpg', '--output', gpgdata_path, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
+            raise Builder.Error('Failed to export GPG key')
+        with open(gpgdata_path, 'rb') as f:
+            gpgdata_base64 = base64.b64encode(f.read())
+
+        # Add GPG key to flatpakrepo files
+        for runtime in self.metadata['runtimes']:
+            with open(os.path.join(self.current_path, 'templates', self.metadata['channel'], runtime + '.flatpakrepo.in'), 'r') as src_file:
+                dest_path = os.path.join(self.temp_path, runtime + '-' + self.metadata['channel'] + '.flatpakrepo')
+                with open(dest_path, 'w') as dest_file:
+                    dest_file.write(src_file.read())
+                    dest_file.write('GPGKey=%s\n' % gpgdata_base64)
+                    if command(['scp', dest_path, dest_url], echo=echo, output=echo).returncode != 0:
+                        raise Builder.Error('Failed to copy "%s"!' % dest_path)
+
+    def sync(self, repo, gpg_key, dest_url, echo=True, **kwargs):
+        super(RuntimeBuilder, self).setup(echo=echo)
+        super(RuntimeBuilder, self).sync(repo, dest_url, echo=echo, **kwargs)
+        self.sync_flatpakrepo(gpg_key, dest_url, echo=echo)
+
+
+if __name__ == '__main__':
+    import argparse
+    import sys
+
+    ARCH = command(['flatpak', '--default-arch']).stdout.decode('utf-8').strip()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
+                        type=argparse.FileType('r'), action='store', required=True)
+    parser.add_argument('--repo', metavar='PATH', help='OSTree repository',
+                        action='store', required=True)
+    parser.add_argument('--arch', help='architecture (default {})'.format(ARCH),
+                        action='store', default=ARCH)
+
+    subparsers = parser.add_subparsers(title='subcommands', description='valid subcommands')
+
+    parser_build = subparsers.add_parser('build', help='build runtime or apps')
+    parser_build.add_argument('--jobs', help='number of parallel jobs',
+                               action='store', type=int)
+    parser_build.add_argument('target', nargs='?', default=None)
+
+    parser_export = subparsers.add_parser('export', help='export repositories')
+    parser_export.add_argument('--gpg-key', help='GPG key to sign commits',
+                               action='store', type=str, required=True)
+
+    parser_sync = subparsers.add_parser('sync', help='publish repositories')
+    parser_sync.add_argument('--gpg-key', help='GPG key to sign commits',
+                             action='store', type=str, required=True)
+    parser_sync.add_argument('--dest', help='destination',
+                             action='store', type=str, required=True)
+    parser_sync.add_argument('--rsync-opts', help='additional rsync options (parsed via shell)',
+                             action='store', default=None)
+    parser_sync.add_argument('--rsync-opt', help='additional (single) rsync option',
+                             action='append', default=[])
+
+    parser_clean = subparsers.add_parser('clean', help='remove binary files')
+    parser_clean.add_argument('--full', help='remove sources, builds and OSTree repositories',
+                              action='store_true')
+
+    args = parser.parse_args()
+
+    if hasattr(args, 'full'):
+        current_path = os.path.abspath(os.path.dirname(__file__))
+        sdk_path = os.path.join(current_path, 'sdk')
+        if os.path.exists(sdk_path):
+            shutil.rmtree(sdk_path)
+        state_path = os.path.join(current_path, '.flatpak-builder')
+        if os.path.exists(state_path):
+            shutil.rmtree(state_path)
+        if args.full is True:
+            repo_path = os.path.abspath(args.repo)
+            if os.path.exists(repo_path):
+                shutil.rmtree(repo_path)
+        sys.exit(0)
+
+    try:
+        r = RuntimeBuilder()
+        r.arch = args.arch
+        r.metadata_file = args.metadata
+        if hasattr(args, 'target'):
+            r.build(args.repo, args.target, jobs=args.jobs)
+        elif hasattr(args, 'gpg_key'):
+            r.export(args.repo, args.gpg_key)
+        elif hasattr(args, 'dest'):
+            r.sync(args.repo, args.gpg_key, args.dest)
+    except Builder.Error as e:
+        sys.stderr.write(e.args[0] + '\n')
+        sys.exit(1)

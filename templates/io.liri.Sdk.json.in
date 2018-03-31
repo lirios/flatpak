@@ -1,0 +1,58 @@
+{
+    "id": "io.liri.Sdk",
+    "id-platform": "io.liri.Platform",
+    "branch": "@@RUNTIME_BRANCH@@",
+    "build-runtime": true,
+    "build-options": {
+        "cflags": "-O2 -g -fstack-protector-strong -D_FORTIFY_SOURCE=2",
+        "cxxflags": "-O2 -g -fstack-protector-strong -D_FORTIFY_SOURCE=2",
+        "env": {
+            "V": "1",
+            "RUNTIME_ARCH": "@@RUNTIME_ARCH@@",
+            "RUNTIME_BRANCH": "@@RUNTIME_BRANCH@@",
+            "BASE_RUNTIME_BRANCH": "@@BASE_RUNTIME_BRANCH@@"
+        },
+        "ldflags": "-fstack-protector-strong -Wl,-z,relro,-z,now"
+    },
+    "runtime": "org.kde.Platform",
+    "runtime-version": "@@BASE_RUNTIME_BRANCH@@",
+    "platform-extensions": [
+        "org.kde.Platform.Locale"
+    ],
+    "sdk": "org.kde.Sdk",
+    "sdk-extensions": [
+        "org.kde.Sdk.Locale"
+    ],
+    "writable-sdk": true,
+    "cleanup": [
+        "/cache",
+        "/man",
+        "/share/doc",
+        "/share/man",
+        "/share/gtk-doc",
+        "/share/devhelp",
+        "/lib/systemd",
+        "*.la"
+    ],
+    "cleanup-commands": [
+        "/usr/libexec/freedesktop-post.sh"
+    ],
+    "cleanup-platform": [
+        "/include",
+        "/share/aclocal",
+        "/share/pkgconfig",
+        "/lib/cmake",
+        "/lib/pkgconfig",
+        "/share/gir-1.0",
+        "/share/vala",
+        "/share/qbs",
+        "*.a"
+    ],
+    "cleanup-platform-commands": [
+        "/usr/libexec/freedesktop-post.sh"
+    ],
+    "finish-args": [
+        "--sdk=io.liri.Sdk//@@RUNTIME_BRANCH@@",
+        "--runtime=io.liri.Platform//@@RUNTIME_BRANCH@@"
+    ]
+}

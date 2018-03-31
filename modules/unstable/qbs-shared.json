@@ -1,0 +1,28 @@
+{
+    "name": "qbs-shared",
+    "buildsystem": "simple",
+    "build-commands": [
+        "./qbs-configure",
+        "./qbs-build qbs.buildVariant:debug modules.qbs.installRoot:/ project.prefix:/usr"
+    ],
+    "cleanup-platform": [
+        "*"
+    ],
+    "sources": [
+        {
+            "type": "git",
+            "url": "git://github.com/lirios/qbs-shared.git",
+            "branch": "develop"
+        },
+        {
+            "type": "file",
+            "path": "sources/qbs-configure",
+            "dest-filename": "qbs-configure"
+        },
+        {
+            "type": "file",
+            "path": "sources/qbs-build",
+            "dest-filename": "qbs-build"
+        }
+    ]
+}

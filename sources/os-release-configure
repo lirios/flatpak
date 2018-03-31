@@ -1,0 +1,32 @@
+#!/bin/sh
+
+cat <<EOF > Makefile
+SUBST_FILES=os-release issue issue.net
+define subst-metadata
+	@echo -n "Generating files: \${SUBST_FILES}... ";
+	@for file in \${SUBST_FILES}; do 					\
+	  file_source=\$\${file}.in;						\
+	  sed                                                                   \
+	      -e 's/@@RUNTIME_ARCH@@/${RUNTIME_ARCH}/g' 			\
+	      -e 's/@@RUNTIME_BRANCH@@/${RUNTIME_BRANCH}/g' 			\
+	      -e 's/@@BASE_RUNTIME_BRANCH@@/${BASE_RUNTIME_BRANCH}/g'		\
+	      \$\$file_source > \$\$file.tmp && mv \$\$file.tmp \$\$file || exit 1;	\
+	done
+	@echo "Done.";
+endef
+
+all:
+	\$(call subst-metadata)
+
+install:
+	mkdir -p ${DESTDIR}/usr/lib
+	install os-release ${DESTDIR}/usr/lib
+	mkdir -p ${DESTDIR}/usr/share/appdata
+	mkdir -p ${DESTDIR}/etc
+	install issue ${DESTDIR}/etc
+	install issue.net ${DESTDIR}/etc
+	install io.liri.Platform.appdata.xml ${DESTDIR}/usr/share/appdata
+	install io.liri.Sdk.appdata.xml ${DESTDIR}/usr/share/appdata
+	appstream-compose --basename=io.liri.Platform --prefix=/usr --origin=flatpak io.liri.Platform
+	appstream-compose --basename=io.liri.Sdk --prefix=/usr --origin=flatpak io.liri.Sdk
+EOF

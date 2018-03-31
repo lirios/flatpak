@@ -1,0 +1,7 @@
+[Flatpak Repo]
+Title=Liri Stable Runtimes
+Url=https://repo.liri.io/flatpak/platform/
+Homepage=https://liri.io/
+Comment=The standard Liri runtime used by our apps
+Description=Liri runtimes are released with each major release and contain the main Liri platform libraries. At the moment they only receive minor bug fixing and security updates, but should be considered ABI stable and frozen.
+Icon=https://liri.io/images/logo-100.png

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+channel=$1
+
+if [ -z "$channel" ]; then
+    echo "Usage: $0 [stable | unstable]"
+    exit 1
+fi
+
+metadata="--metadata=${channel}-metadata.yml"
+gpg_key="7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE"
+
+./flatpak-build --repo=runtime-repo $metadata build --jobs=2
+./flatpak-build --repo=runtime-repo $metadata export --gpg-key=$gpg_key
+./flatpak-build --repo=runtime-repo $metadata sync --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak
