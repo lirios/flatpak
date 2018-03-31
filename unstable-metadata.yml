@@ -23,9 +23,6 @@ runtimes:
       - modules/unstable/fluid.json
       - modules/unstable/os-release.json
 apps:
-  io.liri.AppCenter:
-    runtime: io.liri.Sdk
-    branch: master
   io.liri.Browser:
     runtime: io.liri.Sdk
     branch: master
