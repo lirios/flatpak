@@ -258,27 +258,43 @@ if __name__ == '__main__':
     ARCH = command(['flatpak', '--default-arch']).stdout.decode('utf-8').strip()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
-                        type=argparse.FileType('r'), action='store', required=True)
-    parser.add_argument('--repo', metavar='PATH', help='OSTree repository',
-                        action='store', default='repo')
-    parser.add_argument('--arch', help='architecture (default {})'.format(ARCH),
-                        action='store', default=ARCH)
-    parser.add_argument('--type', help='target type',
-                        type=str, choices=['runtime', 'app'], required=True)
 
     subparsers = parser.add_subparsers(title='subcommands', description='valid subcommands')
 
     parser_build = subparsers.add_parser('build', help='build runtime or apps')
+    parser_build.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
+                              type=argparse.FileType('r'), action='store', required=True)
+    parser_build.add_argument('--repo', metavar='PATH', help='OSTree repository',
+                              action='store', default='repo')
+    parser_build.add_argument('--arch', help='architecture (default {})'.format(ARCH),
+                              action='store', default=ARCH)
+    parser_build.add_argument('--type', help='target type',
+                              type=str, choices=['runtime', 'app'], required=True)
     parser_build.add_argument('--jobs', help='number of parallel jobs',
                                action='store', type=int)
     parser_build.add_argument('target', nargs='?', default=None)
 
     parser_export = subparsers.add_parser('export', help='export repositories')
+    parser_export.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
+                               type=argparse.FileType('r'), action='store', required=True)
+    parser_export.add_argument('--repo', metavar='PATH', help='OSTree repository',
+                               action='store', default='repo')
+    parser_export.add_argument('--arch', help='architecture (default {})'.format(ARCH),
+                               action='store', default=ARCH)
+    parser_export.add_argument('--type', help='target type',
+                               type=str, choices=['runtime', 'app'], required=True)
     parser_export.add_argument('--gpg-key', help='GPG key to sign commits',
                                action='store', type=str, required=True)
 
     parser_sync = subparsers.add_parser('sync', help='publish repositories')
+    parser_sync.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
+                             type=argparse.FileType('r'), action='store', required=True)
+    parser_sync.add_argument('--repo', metavar='PATH', help='OSTree repository',
+                             action='store', default='repo')
+    parser_sync.add_argument('--arch', help='architecture (default {})'.format(ARCH),
+                             action='store', default=ARCH)
+    parser_sync.add_argument('--type', help='target type',
+                             type=str, choices=['runtime', 'app'], required=True)
     parser_sync.add_argument('--gpg-key', help='GPG key to sign commits',
                              action='store', type=str, required=True)
     parser_sync.add_argument('--dest', help='destination',
