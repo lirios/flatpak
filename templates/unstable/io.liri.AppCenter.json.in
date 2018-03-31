@@ -1,0 +1,177 @@
+{
+    "app-id": "io.liri.AppCenter",
+    "branch": "@@APP_BRANCH@@",
+    "runtime": "io.liri.Platform",
+    "runtime-version": "@@RUNTIME_BRANCH@@",
+    "sdk": "io.liri.Sdk",
+    "cleanup-commands": [
+        "rm -f /app/share/appdata/*"
+    ],
+    "command": "liri-appcenter",
+    "tags": [ "nightly" ],
+    "desktop-file-name-suffix": " (Nightly)",
+    "finish-args": [
+        "--share=ipc",
+        "--share=network",
+        "--socket=x11",
+        "--socket=wayland",
+        "--filesystem=~/.local/share/flatpak",
+        "--filesystem=/var/lib/flatpak",
+        "--filesystem=xdg-run/dconf",
+        "--filesystem=~/.config/dconf:ro",
+        "--talk-name=ca.desrt.dconf",
+        "--env=DCONF_USER_CONFIG_DIR=.config/dconf",
+        "--device=dri"
+    ],
+    "modules": [
+        {
+            "name": "libfuse",
+            "cleanup": ["/bin"],
+            "config-opts": [
+                "--disable-util"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz",
+                    "sha256": "832432d1ad4f833c20e13b57cf40ce5277a9d33e483205fc63c78111b3358874"
+                }
+            ]
+        },
+        {
+            "name": "ostree",
+            "build-options": {
+                "env": {
+                    "BASH_COMPLETIONSDIR": "/app/share/bash-completion/completions"
+                }
+            },
+            "cleanup": ["/bin", "/etc/grub.d", "/share/bash-completion", "/libexec"],
+            "config-opts": [
+                "--disable-man"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/ostreedev/ostree.git",
+                    "branch": "v2018.4"
+                }
+            ]
+        },
+        {
+            "name": "appstream",
+            "config-opts": [
+                "--libdir=lib",
+                "-Denable-qt=true",
+                "-Dstemming=false"
+            ],
+            "buildsystem": "meson",
+            "builddir": true,
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/ximion/appstream.git",
+                    "branch": "9c11ba6973fc8a0b0ff59f28bafb84ebea154a9d"
+                }
+            ]
+        },
+        {
+            "name": "flatpak",
+            "config-opts": [
+                "--disable-documentation",
+                "--disable-seccomp",
+                "--disable-sandboxed-triggers",
+                "--disable-system-helper"
+            ],
+            "make-args": [
+                "XDG_APP_BINDIR=/usr/bin"
+            ],
+            "cleanup": [
+                "/etc/profile.d",
+                "/libexec",
+                "/lib/systemd",
+                "/share/dbus-1/interfaces/org.freedesktop.*",
+                "/share/dbus-1/services/org.freedesktop.*",
+                "/share/gdm"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://github.com/flatpak/flatpak",
+                    "branch": "0.11.3"
+                }
+            ],
+            "post-install": [
+                "cp /usr/bin/gtk-update-icon-cache /app/bin",
+                "cp /usr/bin/update-mime-database /app/bin",
+                "cp /usr/bin/update-desktop-database /app/bin"
+            ]
+        },
+        {
+            "name": "libqtxdg",
+            "buildsystem": "cmake",
+            "config-opts": [
+                "-DQTXDGX_ICONENGINEPLUGIN_INSTALL_PATH=/app/lib/plugins/iconengines/libQt5XdgIconPlugin.so"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://github.com/lxqt/libqtxdg.git",
+                    "branch": "3.1.0"
+                }
+            ]
+        },
+        {
+            "name": "liri-appcenter",
+            "buildsystem": "simple",
+            "build-commands": [
+                "./qbs-configure",
+                "./qbs-build qbs.buildVariant:debug qbs.installRoot:/ modules.lirideployment.prefix:/app"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://github.com/lirios/appcenter.git",
+                    "branch": "develop"
+                },
+                {
+                    "dest-filename": "qbs-configure",
+                    "path": "sources/qbs-configure",
+                    "type": "file"
+                },
+                {
+                    "dest-filename": "qbs-build",
+                    "path": "sources/qbs-build",
+                    "type": "file"
+                }
+            ],
+            "modules": [
+                {
+                    "name": "libliri",
+                    "buildsystem": "simple",
+                    "build-commands": [
+                        "./qbs-configure",
+                        "./qbs-build qbs.buildVariant:debug qbs.installRoot:/ modules.lirideployment.prefix:/app"
+                    ],
+                    "cleanup-platform": ["/share/qbs"],
+                    "sources": [
+                        {
+                            "type": "git",
+                            "url": "git://github.com/lirios/libliri.git",
+                            "branch": "develop"
+                        },
+                        {
+                            "dest-filename": "qbs-configure",
+                            "path": "sources/qbs-configure",
+                            "type": "file"
+                        },
+                        {
+                            "dest-filename": "qbs-build",
+                            "path": "sources/qbs-build",
+                            "type": "file"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
