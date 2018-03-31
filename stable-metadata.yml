@@ -13,7 +13,7 @@ runtimes:
           remote: flathub
           version: '5.10'
     base-runtime-branch: '5.10'
-    branch: 1.0.0
+    branch: '1.0.0'
     appdata:
       - io.liri.Platform.appdata.xml
       - io.liri.Sdk.appdata.xml
