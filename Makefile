@@ -19,7 +19,7 @@ GPGKEY = 7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE
 # RUNTIME_BRANCH:       The version (branch) of platform and SDK to produce
 # FREEDESKTOP_VERSION:  The org.freedesktop.Platform and org.freedesktop.Sdk version to build against
 #
-RUNTIME_BRANCH = master
+RUNTIME_BRANCH = 1.0
 FREEDESKTOP_VERSION = 1.6
 KDE_VERSION = 5.10
 
