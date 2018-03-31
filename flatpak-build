@@ -40,6 +40,7 @@ class Builder(object):
     metadata = None
     current_path = os.path.abspath(os.path.dirname(__file__))
     temp_path = '/tmp/liri-flatpak'
+    repo_path = None
 
     class Error(Exception):
         pass
@@ -54,13 +55,11 @@ class Builder(object):
         if self.metadata is None:
             raise Builder.Error('Metadata was not loaded')
 
-    def build(self, repo, target, jobs=None, echo=False, **kwargs):
+    def build(self, target, jobs=None, echo=False, **kwargs):
         self.setup()
 
-    def export(self, repo, gpg_key, echo=False, **kwargs):
-        repo_path = os.path.abspath(repo)
-
-        if command(['flatpak', 'build-update-repo', repo_path, '--gpg-sign=' + gpg_key, '--prune', '--prune-depth=20'], echo=echo, output=echo).returncode != 0:
+    def export(self, gpg_key, echo=False, **kwargs):
+        if command(['flatpak', 'build-update-repo', self.repo_path, '--gpg-sign=' + gpg_key, '--prune', '--prune-depth=20'], echo=echo, output=echo).returncode != 0:
             raise Builder.Error('Failed to export OSTree repository')
 
     def encode_gpg_key(self, gpg_key, echo=False):
@@ -71,10 +70,9 @@ class Builder(object):
         with open(gpgdata_path, 'rb') as f:
             return base64.b64encode(f.read())
 
-    def sync(self, repo, gpg_key, dest_url, echo=False, **kwargs):
+    def sync(self, gpg_key, dest_url, echo=False, **kwargs):
         self.setup(echo=echo)
-        repo_path = os.path.abspath(repo)
-        rsync(repo_path, dest_url)
+        rsync(self.repo_path, dest_url)
 
 
 class RuntimeBuilder(Builder):
@@ -98,7 +96,7 @@ class RuntimeBuilder(Builder):
         for dirname in ('templates', 'sources', 'patches'):
             shutil.copytree(os.path.join(self.current_path, dirname), os.path.join(self.temp_path, dirname))
 
-    def build_runtime(self, runtime, repo_path, sdk_path, state_path, jobs=None, echo=True):
+    def build_runtime(self, runtime, sdk_path, state_path, jobs=None, echo=True):
         modules_list = []
         for module in self.metadata['runtimes'][runtime].get('modules', []):
             with open(os.path.join(self.current_path, module), 'r') as module_file:
@@ -134,7 +132,7 @@ class RuntimeBuilder(Builder):
             subject = 'Build of %s at %s' % (runtime, now)
 
             argv = ['flatpak-builder', '--ccache', '--force-clean', '--require-changes',
-                    '--repo=' + repo_path, '--state-dir=' + state_path,
+                    '--repo=' + self.repo_path, '--state-dir=' + state_path,
                     '--arch=' + self.arch, '--subject="%s"' % subject,
                     sdk_path, os.path.join(self.temp_path, runtime + '.json')]
             if jobs is not None and isinstance(jobs, int):
@@ -143,26 +141,22 @@ class RuntimeBuilder(Builder):
             if result.returncode != 0:
                 raise Builder.Error('Build failed')
 
-    def build(self, repo, target, jobs=None, echo=True, **kwargs):
-        if repo is None:
-            raise Builder.Error('Specify OSTree repository path')
-
+    def build(self, target, jobs=None, echo=True, **kwargs):
         self.setup()
 
-        repo_path = os.path.abspath(repo)
         sdk_path = os.path.join(self.current_path, 'sdk')
         state_path = os.path.join(self.current_path, '.flatpak-builder')
 
         if target is None:
             for runtime in self.metadata['runtimes']:
-                self.build_runtime(runtime, repo_path, sdk_path, state_path, jobs=jobs, echo=echo)
+                self.build_runtime(runtime, sdk_path, state_path, jobs=jobs, echo=echo)
         else:
             if target not in self.metadata['runtimes']:
                 raise Builder.Error('Unknown runtime ' + target)
-            self.build_runtime(target, repo_path, sdk_path, state_path, jobs=jobs, echo=echo)
+            self.build_runtime(target, sdk_path, state_path, jobs=jobs, echo=echo)
 
-    def export(self, repo, gpg_key, echo=False, **kwargs):
-        super(RuntimeBuilder, self).export(repo, gpg_key, echo=echo, **kwargs)
+    def export(self, gpg_key, echo=False, **kwargs):
+        super(RuntimeBuilder, self).export(gpg_key, echo=echo, **kwargs)
 
     def sync_flatpakrepo(self, gpg_key, dest_url, echo=True):
         self.copy_files()
@@ -178,13 +172,13 @@ class RuntimeBuilder(Builder):
                     if command(['scp', dest_path, dest_url], echo=echo, output=echo).returncode != 0:
                         raise Builder.Error('Failed to copy "%s"!' % dest_path)
 
-    def sync(self, repo, gpg_key, dest_url, echo=True, **kwargs):
-        super(RuntimeBuilder, self).sync(repo, dest_url, echo=echo, **kwargs)
+    def sync(self, gpg_key, dest_url, echo=True, **kwargs):
+        super(RuntimeBuilder, self).sync(dest_url, echo=echo, **kwargs)
         self.sync_flatpakrepo(gpg_key, dest_url, echo=echo)
 
 
 class AppBuilder(RuntimeBuilder):
-    def build_app(self, app, app_metadata, repo_path, sdk_path, state_path, jobs=None, echo=True):
+    def build_app(self, app, app_metadata, sdk_path, state_path, jobs=None, echo=True):
         channel = self.metadata['channel']
         runtime = app_metadata['runtime']
         branch = app_metadata['branch']
@@ -202,7 +196,7 @@ class AppBuilder(RuntimeBuilder):
             subject = 'Build of %s at %s' % (app, now)
 
             argv = ['flatpak-builder', '--ccache', '--force-clean',
-                    '--repo=' + repo_path, '--state-dir=' + state_path,
+                    '--repo=' + self.repo_path, '--state-dir=' + state_path,
                     '--arch=' + self.arch, '--subject="%s"' % subject,
                     sdk_path, os.path.join(self.temp_path, app + '.json')]
             if jobs is not None and isinstance(jobs, int):
@@ -211,24 +205,20 @@ class AppBuilder(RuntimeBuilder):
             if result.returncode != 0:
                 raise Builder.Error('Build failed')
 
-    def build(self, repo, target, jobs=None, echo=True, **kwargs):
-        if repo is None:
-            raise Builder.Error('Specify OSTree repository path')
-
+    def build(self, target, jobs=None, echo=True, **kwargs):
         self.setup()
         self.copy_files()
 
-        repo_path = os.path.abspath(repo)
         sdk_path = os.path.join(self.current_path, 'sdk')
         state_path = os.path.join(self.current_path, '.flatpak-builder')
 
         if target is None:
             for app in self.metadata.get('apps', []):
-                self.build_app(app, self.metadata['apps'][app], repo_path, sdk_path, state_path, jobs=jobs, echo=echo)
+                self.build_app(app, self.metadata['apps'][app], sdk_path, state_path, jobs=jobs, echo=echo)
         else:
             if target not in self.metadata.get('apps', []):
                 raise Builder.Error('Unknown app ' + target)
-            self.build_app(target, self.metadata['apps'][target], repo_path, sdk_path, state_path, jobs=jobs, echo=echo)
+            self.build_app(target, self.metadata['apps'][target], sdk_path, state_path, jobs=jobs, echo=echo)
 
     def sync_flatpakref(self, gpg_key, dest_url, echo=True):
         self.copy_files()
@@ -256,8 +246,8 @@ class AppBuilder(RuntimeBuilder):
                     if command(['scp', dest_path, dest_url], echo=echo, output=echo).returncode != 0:
                         raise Builder.Error('Failed to copy "%s"!' % dest_path)
 
-    def sync(self, repo, gpg_key, dest_url, echo=True, **kwargs):
-        super(AppBuilder, self).sync(repo, dest_url, echo=echo, **kwargs)
+    def sync(self, gpg_key, dest_url, echo=True, **kwargs):
+        super(AppBuilder, self).sync(dest_url, echo=echo, **kwargs)
         self.sync_flatpakref(gpg_key, dest_url, echo=echo)
 
 
@@ -325,12 +315,13 @@ if __name__ == '__main__':
             builder = AppBuilder()
         builder.arch = args.arch
         builder.metadata_file = args.metadata
+        builder.repo_path = os.path.abspath(args.repo)
         if hasattr(args, 'target'):
-            builder.build(args.repo, args.target, jobs=args.jobs)
+            builder.build(args.target, jobs=args.jobs)
         elif hasattr(args, 'gpg_key'):
-            builder.export(args.repo, args.gpg_key)
+            builder.export(args.gpg_key)
         elif hasattr(args, 'dest'):
-            builder.sync(args.repo, args.gpg_key, args.dest)
+            builder.sync(args.gpg_key, args.dest)
     except Builder.Error as e:
         sys.stderr.write(e.args[0] + '\n')
         sys.exit(1)
