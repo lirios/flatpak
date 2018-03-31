@@ -1,0 +1,7 @@
+[Flatpak Ref]
+Title=Fluid Demo
+Name=io.liri.Fluid.Demo
+Branch=@@APP_BRANCH@@
+Url=https://repo.liri.io/flatpak/repo/
+IsRuntime=False
+RuntimeRepo=https://repo.liri.io/flatpak/io.liri.Sdk-unstable.flatpakrepo

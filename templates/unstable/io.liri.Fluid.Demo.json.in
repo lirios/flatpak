@@ -1,0 +1,43 @@
+{
+    "id": "io.liri.Fluid.Demo",
+    "branch": "@@APP_BRANCH@@",
+    "runtime": "io.liri.Platform",
+    "runtime-version": "@@RUNTIME_BRANCH@@",
+    "sdk": "io.liri.Sdk",
+    "command": "fluid-demo",
+    "tags": [ "nightly" ],
+    "desktop-file-name-prefix": "(Nightly) ",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=x11",
+        "--socket=wayland",
+        "--device=dri"
+    ],
+    "modules": [
+        {
+            "name": "fluid",
+            "buildsystem": "simple",
+            "build-commands": [
+                "./qbs-configure",
+                "./qbs-build qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app project.useSystemQbsShared:true project.withDocumentation:false project.withDemo:true project.withQmlModules:false project.deploymentEnabled:false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://github.com/lirios/fluid.git",
+                    "branch": "develop"
+                },
+                {
+                    "dest-filename": "qbs-configure",
+                    "path": "sources/qbs-configure",
+                    "type": "file"
+                },
+                {
+                    "dest-filename": "qbs-build",
+                    "path": "sources/qbs-build",
+                    "type": "file"
+                }
+            ]
+        }
+    ]
+}
