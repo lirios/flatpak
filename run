@@ -15,5 +15,5 @@ gpg_key="7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE"
 for t in runtime app; do
     ./flatpak-build build $metadata --type=$t --jobs=2
     ./flatpak-build export $metadata --type=$t --gpg-key=$gpg_key
-    ./flatpak-build sync $metadata --type=$t --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak
+    ./flatpak-build sync $metadata --type=$t --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak2
 done
