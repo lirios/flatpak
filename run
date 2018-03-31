@@ -13,7 +13,7 @@ metadata="--metadata=${channel}-metadata.yml"
 gpg_key="7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE"
 
 for t in runtime app; do
-    ./flatpak-build --repo=${t}-repo $metadata --type=$t build --jobs=2
-    ./flatpak-build --repo=${t}-repo $metadata --type=$t export --gpg-key=$gpg_key
-    ./flatpak-build --repo=${t}-repo $metadata --type=$t sync --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak
+    ./flatpak-build $metadata --type=$t build --jobs=2
+    ./flatpak-build $metadata --type=$t export --gpg-key=$gpg_key
+    ./flatpak-build $metadata --type=$t sync --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak
 done
