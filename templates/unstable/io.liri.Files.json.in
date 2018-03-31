@@ -1,0 +1,63 @@
+{
+    "app-id": "io.liri.Files",
+    "branch": "@@APP_BRANCH@@",
+    "runtime": "io.liri.Platform",
+    "runtime-version": "@@RUNTIME_BRANCH@@",
+    "sdk": "io.liri.Sdk",
+    "cleanup-commands": [
+        "rm -f /app/share/appdata/*"
+    ],
+    "command": "liri-files",
+    "tags": [ "nightly" ],
+    "desktop-file-name-suffix": " (Nightly)",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=x11",
+        "--socket=wayland",
+        "--filesystem=host",
+        "--env=SESSION_MANAGER="
+    ],
+    "modules": [
+        {
+            "name": "taglib",
+            "cmake": true,
+            "config-opts": [
+                "-DBUILD_SHARED_LIBS=ON",
+                "-DWITH_MP4=ON",
+                "-DWITH_ASF=ON"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "http://taglib.github.io/releases/taglib-1.11.1.tar.gz",
+                    "sha256": "b6d1a5a610aae6ff39d93de5efd0fdc787aa9e9dc1e7026fa4c961b26563526b"
+                }
+            ]
+        },
+        {
+            "name": "files",
+            "buildsystem": "simple",
+            "build-commands": [
+                "./qbs-configure",
+                "./qbs-build qbs.buildVariant:debug qbs.installRoot:/ qbs.installPrefix:app"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://github.com/lirios/files.git",
+                    "branch": "develop"
+                },
+                {
+                    "dest-filename": "qbs-configure",
+                    "path": "sources/qbs-configure",
+                    "type": "file"
+                },
+                {
+                    "dest-filename": "qbs-build",
+                    "path": "sources/qbs-build",
+                    "type": "file"
+                }
+            ]
+        }
+    ]
+}

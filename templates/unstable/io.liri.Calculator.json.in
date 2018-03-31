@@ -1,0 +1,45 @@
+{
+    "app-id": "io.liri.Calculator",
+    "branch": "@@APP_BRANCH@@",
+    "runtime": "io.liri.Platform",
+    "runtime-version": "@@RUNTIME_BRANCH@@",
+    "sdk": "io.liri.Sdk",
+    "command": "liri-calculator",
+    "tags": [ "nightly" ],
+    "desktop-file-name-suffix": " (Nightly)",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=x11",
+        "--socket=wayland",
+        "--filesystem=home",
+        "--device=dri",
+        "--env=SESSION_MANAGER="
+    ],
+    "modules": [
+        {
+            "name": "calculator",
+            "buildsystem": "simple",
+            "build-commands": [
+                "./qbs-configure",
+                "./qbs-build qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://github.com/lirios/calculator.git",
+                    "branch": "develop"
+                },
+                {
+                    "dest-filename": "qbs-configure",
+                    "path": "sources/qbs-configure",
+                    "type": "file"
+                },
+                {
+                    "dest-filename": "qbs-build",
+                    "path": "sources/qbs-build",
+                    "type": "file"
+                }
+            ]
+        }
+    ]
+}

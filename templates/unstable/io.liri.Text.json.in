@@ -1,0 +1,44 @@
+{
+    "app-id": "io.liri.Text",
+    "branch": "@@APP_BRANCH@@",
+    "runtime": "io.liri.Platform",
+    "runtime-version": "@@RUNTIME_BRANCH@@",
+    "sdk": "io.liri.Sdk",
+    "command": "liri-text",
+    "tags": [ "nightly" ],
+    "desktop-file-name-suffix": " (Nightly)",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=x11",
+        "--socket=wayland",
+        "--filesystem=home",
+        "--device=dri"
+    ],
+    "modules": [
+        {
+            "name": "text",
+            "buildsystem": "simple",
+            "build-commands": [
+                "./qbs-configure",
+                "./qbs-build qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://github.com/lirios/text.git",
+                    "branch": "develop"
+                },
+                {
+                    "dest-filename": "qbs-configure",
+                    "path": "sources/qbs-configure",
+                    "type": "file"
+                },
+                {
+                    "dest-filename": "qbs-build",
+                    "path": "sources/qbs-build",
+                    "type": "file"
+                }
+            ]
+        }
+    ]
+}

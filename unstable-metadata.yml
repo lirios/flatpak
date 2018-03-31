@@ -22,3 +22,19 @@ runtimes:
       - modules/unstable/qbs-shared.json
       - modules/unstable/fluid.json
       - modules/unstable/os-release.json
+apps:
+  io.liri.Calculator:
+    runtime: io.liri.Sdk
+    branch: master
+  io.liri.Text:
+    runtime: io.liri.Sdk
+    branch: master
+  io.liri.Browser:
+    runtime: io.liri.Sdk
+    branch: master
+  io.liri.Files:
+    runtime: io.liri.Sdk
+    branch: master
+  io.liri.Terminal:
+    runtime: io.liri.Sdk
+    branch: master

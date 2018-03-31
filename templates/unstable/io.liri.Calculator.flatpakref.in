@@ -1,0 +1,7 @@
+[Flatpak Ref]
+Title=Liri Calculator
+Name=io.liri.Calculator
+Branch=@@APP_BRANCH@@
+Url=https://repo.liri.io/flatpak/apps/
+IsRuntime=False
+RuntimeRepo=https://repo.liri.io/flatpak/io.liri.Sdk-unstable.flatpakrepo
