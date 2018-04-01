@@ -22,3 +22,7 @@ runtimes:
       - modules/stable/qbs-shared.json
       - modules/stable/fluid.json
       - modules/stable/os-release.json
+apps:
+  io.liri.Installer:
+    runtime: io.liri.Sdk
+    branch: '3.1'
