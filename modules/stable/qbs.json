@@ -5,9 +5,9 @@
     ],
     "sources": [
         {
-            "type": "git",
-            "url": "git://code.qt.io/qbs/qbs.git",
-            "branch": "v1.10.0"
+            "type": "archive",
+            "url": "http://download.qt.io/official_releases/qbs/1.11.0/qbs-src-1.11.0.tar.gz",
+            "sha256": "6ce30c468e688f6843468324a34a7191409b471c3ff6f3e834ef8bfa7b3467cd"
         },
         {
             "type": "patch",
@@ -15,10 +15,10 @@
         },
         {
             "type": "script",
+            "dest-filename": "configure",
             "commands": [
                 "qmake QBS_INSTALL_PREFIX=/usr CONFIG+=qbs_enable_project_file_updates qbs.pro"
-            ],
-            "dest-filename": "configure"
+            ]
         }
     ]
 }
