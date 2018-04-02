@@ -55,7 +55,7 @@ class Builder(object):
         if self.metadata is None:
             raise Builder.Error('Metadata was not loaded')
 
-    def build(self, target, jobs=None, echo=False, **kwargs):
+    def build(self, target, gpg_key, jobs=None, echo=False, **kwargs):
         self.setup()
 
     def export(self, gpg_key, echo=False, **kwargs):
@@ -96,7 +96,7 @@ class RuntimeBuilder(Builder):
         for dirname in ('templates', 'sources', 'patches'):
             shutil.copytree(os.path.join(self.current_path, dirname), os.path.join(self.temp_path, dirname))
 
-    def build_runtime(self, runtime, sdk_path, state_path, jobs=None, echo=True):
+    def build_runtime(self, runtime, gpg_key, sdk_path, state_path, jobs=None, echo=True):
         modules_list = []
         for module in self.metadata['runtimes'][runtime].get('modules', []):
             with open(os.path.join(self.current_path, module), 'r') as module_file:
@@ -134,6 +134,7 @@ class RuntimeBuilder(Builder):
             argv = ['flatpak-builder', '--ccache', '--force-clean', '--require-changes',
                     '--repo=' + self.repo_path, '--state-dir=' + state_path,
                     '--arch=' + self.arch, '--subject="%s"' % subject,
+                    '--gpg-sign=' + gpg_key,
                     sdk_path, os.path.join(self.temp_path, runtime + '.json')]
             if jobs is not None and isinstance(jobs, int):
                 argv.extend(['--jobs', str(jobs)])
@@ -141,7 +142,7 @@ class RuntimeBuilder(Builder):
             if result.returncode != 0:
                 raise Builder.Error('Build failed')
 
-    def build(self, target, jobs=None, echo=True, **kwargs):
+    def build(self, target, gpg_key, jobs=None, echo=True, **kwargs):
         self.setup()
 
         sdk_path = os.path.join(self.current_path, 'sdk')
@@ -149,11 +150,11 @@ class RuntimeBuilder(Builder):
 
         if target is None:
             for runtime in self.metadata['runtimes']:
-                self.build_runtime(runtime, sdk_path, state_path, jobs=jobs, echo=echo)
+                self.build_runtime(runtime, gpg_key, sdk_path, state_path, jobs=jobs, echo=echo)
         else:
             if target not in self.metadata['runtimes']:
                 raise Builder.Error('Unknown runtime ' + target)
-            self.build_runtime(target, sdk_path, state_path, jobs=jobs, echo=echo)
+            self.build_runtime(target, gpg_key, sdk_path, state_path, jobs=jobs, echo=echo)
 
     def export(self, gpg_key, echo=False, **kwargs):
         super(RuntimeBuilder, self).export(gpg_key, echo=echo, **kwargs)
@@ -178,7 +179,7 @@ class RuntimeBuilder(Builder):
 
 
 class AppBuilder(RuntimeBuilder):
-    def build_app(self, app, app_metadata, sdk_path, state_path, jobs=None, echo=True):
+    def build_app(self, app, gpg_key, app_metadata, sdk_path, state_path, jobs=None, echo=True):
         channel = self.metadata['channel']
         runtime = app_metadata['runtime']
         branch = app_metadata['branch']
@@ -198,6 +199,7 @@ class AppBuilder(RuntimeBuilder):
             argv = ['flatpak-builder', '--ccache', '--force-clean', '--require-changes',
                     '--repo=' + self.repo_path, '--state-dir=' + state_path,
                     '--arch=' + self.arch, '--subject="%s"' % subject,
+                    '--gpg-sign=' + gpg_key,
                     sdk_path, os.path.join(self.temp_path, app + '.json')]
             if jobs is not None and isinstance(jobs, int):
                 argv.extend(['--jobs', str(jobs)])
@@ -205,7 +207,7 @@ class AppBuilder(RuntimeBuilder):
             if result.returncode != 0:
                 raise Builder.Error('Build failed')
 
-    def build(self, target, jobs=None, echo=True, **kwargs):
+    def build(self, target, gpg_key, jobs=None, echo=True, **kwargs):
         self.setup()
         self.copy_files()
 
@@ -214,11 +216,11 @@ class AppBuilder(RuntimeBuilder):
 
         if target is None:
             for app in self.metadata.get('apps', []):
-                self.build_app(app, self.metadata['apps'][app], sdk_path, state_path, jobs=jobs, echo=echo)
+                self.build_app(app, gpg_key, self.metadata['apps'][app], sdk_path, state_path, jobs=jobs, echo=echo)
         else:
             if target not in self.metadata.get('apps', []):
                 raise Builder.Error('Unknown app ' + target)
-            self.build_app(target, self.metadata['apps'][target], sdk_path, state_path, jobs=jobs, echo=echo)
+            self.build_app(target, gpg_key, self.metadata['apps'][target], sdk_path, state_path, jobs=jobs, echo=echo)
 
     def sync_flatpakref(self, gpg_key, dest_url, echo=True):
         self.copy_files()
@@ -270,6 +272,8 @@ if __name__ == '__main__':
                               action='store', default=ARCH)
     parser_build.add_argument('--type', help='target type',
                               type=str, choices=['runtime', 'app'], required=True)
+    parser_build.add_argument('--gpg-key', help='GPG key to sign commits',
+                              action='store', type=str, required=True)
     parser_build.add_argument('--jobs', help='number of parallel jobs',
                                action='store', type=int)
     parser_build.add_argument('target', nargs='?', default=None)
@@ -333,7 +337,7 @@ if __name__ == '__main__':
         builder.metadata_file = args.metadata
         builder.repo_path = os.path.abspath(args.repo)
         if hasattr(args, 'target'):
-            builder.build(args.target, jobs=args.jobs)
+            builder.build(args.target, args.gpg_key, jobs=args.jobs)
         elif hasattr(args, 'gpg_key'):
             builder.export(args.gpg_key)
         elif hasattr(args, 'dest'):
