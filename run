@@ -2,6 +2,12 @@
 
 set -e
 
+msg() {
+    lightblue='\033[1;34m'
+    reset='\e[0m'
+    echo -e "${lightblue}$@${reset}"
+}
+
 channel=$1
 
 if [ -z "$channel" ]; then
@@ -13,7 +19,10 @@ metadata="--metadata=${channel}-metadata.yml"
 gpg_key="7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE"
 
 for t in runtime app; do
+    msg "== Build $t"
     ./flatpak-build build $metadata --type=$t --jobs=2
+    msg "== Export $t"
     ./flatpak-build export $metadata --type=$t --gpg-key=$gpg_key
+    msg "== Publish $t"
     ./flatpak-build sync $metadata --type=$t --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak2
 done
