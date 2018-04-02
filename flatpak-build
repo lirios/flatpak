@@ -32,6 +32,7 @@ import json
 import yaml
 import shlex
 import shutil
+import tempfile
 
 
 class Builder(object):
@@ -50,13 +51,13 @@ class Builder(object):
             raise Builder.Error('Metadata file was not specified')
         self.metadata = yaml.load(self.metadata_file.read())
 
-    def setup(self, echo=False):
+    def setup(self, gpg_key, echo=False):
         self.prepare()
         if self.metadata is None:
             raise Builder.Error('Metadata was not loaded')
 
     def build(self, target, gpg_key, jobs=None, echo=False, **kwargs):
-        self.setup()
+        self.setup(gpg_key)
 
     def export(self, gpg_key, echo=False, **kwargs):
         if command(['flatpak', 'build-update-repo', self.repo_path, '--gpg-sign=' + gpg_key, '--prune', '--prune-depth=20'], echo=echo, output=echo).returncode != 0:
@@ -71,15 +72,27 @@ class Builder(object):
             return base64.b64encode(f.read())
 
     def sync(self, gpg_key, dest_url, echo=False, **kwargs):
-        self.setup(echo=echo)
+        self.setup(gpg_key, echo=echo)
         rsync(self.repo_path, dest_url)
 
 
 class RuntimeBuilder(Builder):
-    def setup(self, echo=True):
-        super(RuntimeBuilder, self).setup(echo=echo)
+    def setup(self, gpg_key, echo=True):
+        super(RuntimeBuilder, self).setup(gpg_key, echo=echo)
 
         for runtime in self.metadata['runtimes']:
+            # Add a remote for the runtimes we build
+            gpg_filename = tempfile.mkstemp(prefix=runtime)[1]
+            if os.path.exists(gpg_filename):
+                os.unlink(gpg_filename)
+            if command(['gpg', '--output', gpg_filename, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
+                raise Builder.Error('Failed to export GPG key')
+            if command(['flatpak', 'remote-delete', '--user', '--force', 'liri-local'], echo=echo, output=echo).returncode != 0:
+                raise Builder.Error('Failed to aremove liri-local remote')
+            if command(['flatpak', 'remote-add', '--user', 'liri-local', self.repo_path, '--gpg-import=' + gpg_filename], echo=echo, output=echo).returncode != 0:
+                raise Builder.Error('Failed to add liri-local remote')
+
+            # Install dependencies
             for remote_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('remotes', []):
                 if command(['flatpak', 'remote-add', '--user', remote_dep['name'], '--from', remote_dep['location'], '--if-not-exists'], echo=echo, output=echo).returncode != 0:
                     raise Builder.Error('Failed to add %s remote' % remote_dep['name'])
@@ -143,7 +156,7 @@ class RuntimeBuilder(Builder):
                 raise Builder.Error('Build failed')
 
     def build(self, target, gpg_key, jobs=None, echo=True, **kwargs):
-        self.setup()
+        self.setup(gpg_key)
 
         sdk_path = os.path.join(self.current_path, 'sdk')
         state_path = os.path.join(self.current_path, '.flatpak-builder')
@@ -200,6 +213,7 @@ class AppBuilder(RuntimeBuilder):
                     '--repo=' + self.repo_path, '--state-dir=' + state_path,
                     '--arch=' + self.arch, '--subject="%s"' % subject,
                     '--gpg-sign=' + gpg_key,
+                    '--install-deps-from=liri-local', '--user',
                     sdk_path, os.path.join(self.temp_path, app + '.json')]
             if jobs is not None and isinstance(jobs, int):
                 argv.extend(['--jobs', str(jobs)])
@@ -208,7 +222,7 @@ class AppBuilder(RuntimeBuilder):
                 raise Builder.Error('Build failed')
 
     def build(self, target, gpg_key, jobs=None, echo=True, **kwargs):
-        self.setup()
+        self.setup(gpg_key)
         self.copy_files()
 
         sdk_path = os.path.join(self.current_path, 'sdk')
