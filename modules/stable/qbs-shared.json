@@ -12,7 +12,7 @@
         {
             "type": "git",
             "url": "git://github.com/lirios/qbs-shared.git",
-            "branch": "v1.2.0"
+            "tag": "v1.2.0"
         },
         {
             "type": "file",
