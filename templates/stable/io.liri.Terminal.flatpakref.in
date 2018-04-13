@@ -1,0 +1,7 @@
+[Flatpak Ref]
+Title=Liri Terminal
+Name=io.liri.Terminal
+Branch=@@APP_BRANCH@@
+Url=https://repo.liri.io/flatpak/repo/
+IsRuntime=False
+RuntimeRepo=https://repo.liri.io/flatpak/io.liri.Sdk-stable.flatpakrepo
