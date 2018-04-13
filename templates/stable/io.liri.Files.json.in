@@ -19,7 +19,7 @@
     "modules": [
         {
             "name": "taglib",
-            "cmake": true,
+            "buildsystem": "cmake-ninja",
             "config-opts": [
                 "-DBUILD_SHARED_LIBS=ON",
                 "-DWITH_MP4=ON",
@@ -38,13 +38,13 @@
             "buildsystem": "simple",
             "build-commands": [
                 "./qbs-configure",
-                "./qbs-build qbs.buildVariant:debug qbs.installRoot:/ qbs.installPrefix:app"
+                "./qbs-build qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app"
             ],
             "sources": [
                 {
                     "type": "git",
                     "url": "git://github.com/lirios/files.git",
-                    "branch": "vX.X.X"
+                    "branch": "v0.2.0"
                 },
                 {
                     "dest-filename": "qbs-configure",

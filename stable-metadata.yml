@@ -23,6 +23,9 @@ runtimes:
       - modules/stable/fluid.json
       - modules/stable/os-release.json
 apps:
+  io.liri.Files:
+    runtime: io.liri.Sdk
+    branch: stable
   io.liri.Installer:
     runtime: io.liri.Sdk
     branch: '3.1'
