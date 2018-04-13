@@ -24,5 +24,5 @@ for t in runtime app; do
     msg "== Export $t"
     ./flatpak-build export $metadata --type=$t --gpg-key=$gpg_key
     msg "== Publish $t"
-    ./flatpak-build sync $metadata --type=$t --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak2
+    ./flatpak-build sync $metadata --type=$t --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak
 done
