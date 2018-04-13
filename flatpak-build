@@ -144,7 +144,7 @@ class RuntimeBuilder(Builder):
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             subject = 'Build of %s at %s' % (runtime, now)
 
-            argv = ['flatpak-builder', '--ccache', '--force-clean', '--require-changes',
+            argv = ['flatpak-builder', '--verbose', '--ccache', '--force-clean', '--require-changes',
                     '--repo=' + self.repo_path, '--state-dir=' + state_path,
                     '--arch=' + self.arch, '--subject="%s"' % subject,
                     '--gpg-sign=' + gpg_key,
@@ -209,7 +209,7 @@ class AppBuilder(RuntimeBuilder):
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             subject = 'Build of %s at %s' % (app, now)
 
-            argv = ['flatpak-builder', '--ccache', '--force-clean', '--require-changes',
+            argv = ['flatpak-builder', '--verbose', '--ccache', '--force-clean', '--require-changes',
                     '--repo=' + self.repo_path, '--state-dir=' + state_path,
                     '--arch=' + self.arch, '--subject="%s"' % subject,
                     '--gpg-sign=' + gpg_key,
