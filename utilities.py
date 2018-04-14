@@ -22,6 +22,7 @@
 #
 
 import sys
+import shlex
 import subprocess
 
 __all__ = (

@@ -18,9 +18,10 @@ fi
 metadata="--metadata=${channel}-metadata.yml"
 gpg_key="7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE"
 
+msg "== Export"
+./flatpak-build export $metadata --gpg-key=$gpg_key
+
 for t in runtime app; do
-    msg "== Export $t"
-    ./flatpak-build export $metadata --type=$t --gpg-key=$gpg_key
     msg "== Publish $t"
     ./flatpak-build sync $metadata --type=$t --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak
 done
