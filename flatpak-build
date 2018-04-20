@@ -70,8 +70,7 @@ class Builder(object):
         with open(gpgdata_path, 'rb') as f:
             return base64.b64encode(f.read())
 
-    def sync(self, gpg_key, dest_url, echo=False, **kwargs):
-        self.setup(gpg_key, echo=echo)
+    def sync(self, dest_url, echo=False, **kwargs):
         rsync(os.path.join(self.repo_path, ''), os.path.join(dest_url, 'repo'), None, [])
 
 
@@ -171,23 +170,20 @@ class RuntimeBuilder(Builder):
     def export(self, gpg_key, echo=True, **kwargs):
         super(RuntimeBuilder, self).export(gpg_key, echo=echo, **kwargs)
 
-    def sync_flatpakrepo(self, gpg_key, dest_url, echo=True):
+    def create_files(self, gpg_key, dest_path, echo=True):
+        self.prepare()
         self.copy_files()
 
         # Add GPG key to flatpakrepo files
         gpgdata_base64 = self.encode_gpg_key(gpg_key, echo=echo)
         for runtime in self.metadata['runtimes']:
             with open(os.path.join(self.current_path, 'templates', self.metadata['channel'], runtime + '.flatpakrepo.in'), 'r') as src_file:
-                dest_path = os.path.join(self.temp_path, runtime + '-' + self.metadata['channel'] + '.flatpakrepo')
-                with open(dest_path, 'w') as dest_file:
+                filename = runtime + '-' + self.metadata['channel'] + '.flatpakrepo'
+                temp_path = os.path.join(self.temp_path, filename)
+                with open(temp_path, 'w') as dest_file:
                     dest_file.write(src_file.read())
                     dest_file.write('GPGKey=%s\n' % gpgdata_base64.decode('ascii'))
-                if command(['scp', dest_path, dest_url], echo=echo, output=echo).returncode != 0:
-                    raise Builder.Error('Failed to copy "%s"!' % dest_path)
-
-    def sync(self, gpg_key, dest_url, echo=True, **kwargs):
-        super(RuntimeBuilder, self).sync(gpg_key, dest_url, echo=echo, **kwargs)
-        self.sync_flatpakrepo(gpg_key, dest_url, echo=echo)
+                shutil.copyfile(temp_path, os.path.join(dest_path, filename))
 
 
 class AppBuilder(RuntimeBuilder):
@@ -235,7 +231,8 @@ class AppBuilder(RuntimeBuilder):
                 raise Builder.Error('Unknown app ' + target)
             self.build_app(target, gpg_key, self.metadata['apps'][target], sdk_path, state_path, jobs=jobs, echo=echo)
 
-    def sync_flatpakref(self, gpg_key, dest_url, echo=True):
+    def create_files(self, gpg_key, dest_path, echo=True):
+        self.prepare()
         self.copy_files()
 
         # Add GPG key to flatpakref files
@@ -247,7 +244,8 @@ class AppBuilder(RuntimeBuilder):
             branch = app_metadata['branch']
 
             with open(os.path.join(self.current_path, 'templates', channel, app + '.flatpakref.in'), 'r') as src_file:
-                dest_path = os.path.join(self.temp_path, app + '-' + channel + '.flatpakref')
+                filename = app + '-' + channel + '.flatpakref'
+                temp_path = os.path.join(self.temp_path, filename)
 
                 contents = src_file.read()
                 contents = contents.replace('@@RUNTIME_ARCH@@', self.arch)
@@ -255,15 +253,11 @@ class AppBuilder(RuntimeBuilder):
                 contents = contents.replace('@@BASE_RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['base-runtime-branch'])
                 contents = contents.replace('@@APP_BRANCH@@', branch)
 
-                with open(dest_path, 'w') as dest_file:
+                with open(temp_path, 'w') as dest_file:
                     dest_file.write(contents)
                     dest_file.write('GPGKey=%s\n' % gpgdata_base64.decode('ascii'))
-                if command(['scp', dest_path, dest_url], echo=echo, output=echo).returncode != 0:
-                    raise Builder.Error('Failed to copy "%s"!' % dest_path)
 
-    def sync(self, gpg_key, dest_url, echo=True, **kwargs):
-        super(AppBuilder, self).sync(gpg_key, dest_url, echo=echo, **kwargs)
-        self.sync_flatpakref(gpg_key, dest_url, echo=echo)
+                shutil.copyfile(temp_path, os.path.join(dest_path, filename))
 
 
 if __name__ == '__main__':
@@ -297,21 +291,25 @@ if __name__ == '__main__':
     parser_export.add_argument('--gpg-key', help='GPG key to sign commits',
                                action='store', type=str, required=True)
 
-    parser_sync = subparsers.add_parser('sync', help='publish repositories')
-    parser_sync.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
-                             type=argparse.FileType('r'), action='store', required=True)
-    parser_sync.add_argument('--arch', help='architecture (default {})'.format(ARCH),
-                             action='store', default=ARCH)
-    parser_sync.add_argument('--type', help='target type',
-                             type=str, choices=['runtime', 'app'], required=True)
-    parser_sync.add_argument('--gpg-key', help='GPG key to sign commits',
-                             action='store', type=str, required=True)
+    parser_sync = subparsers.add_parser('sync', help='synchronize repositories')
     parser_sync.add_argument('--dest', help='destination',
                              action='store', type=str, required=True)
     parser_sync.add_argument('--rsync-opts', help='additional rsync options (parsed via shell)',
                              action='store', default=None)
     parser_sync.add_argument('--rsync-opt', help='additional (single) rsync option',
                              action='append', default=[])
+
+    parser_files = subparsers.add_parser('files', help='create files')
+    parser_files.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
+                              type=argparse.FileType('r'), action='store', required=True)
+    parser_files.add_argument('--arch', help='architecture (default {})'.format(ARCH),
+                              action='store', default=ARCH)
+    parser_files.add_argument('--type', help='target type',
+                              type=str, choices=['runtime', 'app'], required=True)
+    parser_files.add_argument('--gpg-key', help='GPG key to sign commits',
+                              action='store', type=str, required=True)
+    parser_files.add_argument('--dest', help='destination',
+                              action='store', type=str, required=True)
 
     parser_clean = subparsers.add_parser('clean', help='remove binary files')
     parser_clean.add_argument('--full', help='remove sources, builds and OSTree repositories',
@@ -341,14 +339,17 @@ if __name__ == '__main__':
                 builder = AppBuilder()
         else:
             builder = Builder()
-        builder.arch = args.arch
         builder.repo_path = os.path.abspath(args.repo)
+        if hasattr(args, 'arch'):
+            builder.arch = args.arch
         if hasattr(args, 'metadata'):
             builder.metadata_file = args.metadata
         if hasattr(args, 'target'):
             builder.build(args.target, args.gpg_key, jobs=args.jobs)
+        elif hasattr(args, 'type') and hasattr(args, 'gpg_key'):
+            builder.create_files(args.gpg_key, args.dest)
         elif hasattr(args, 'dest'):
-            builder.sync(args.gpg_key, args.dest)
+            builder.sync(args.dest)
         elif hasattr(args, 'gpg_key'):
             builder.export(args.gpg_key, echo=True)
     except Builder.Error as e:

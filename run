@@ -26,7 +26,5 @@ for t in runtime app; do
     ./flatpak-build export --gpg-key=$gpg_key
 done
 
-for t in runtime app; do
-    msg "== Publish $t"
-    ./flatpak-build sync $metadata --type=$t --gpg-key=$gpg_key --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak
-done
+msg "== Synchronize"
+./flatpak-build sync --dest=liri@liri.io:/srv/www/repo.liri.io/flatpak
