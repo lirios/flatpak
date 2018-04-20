@@ -78,6 +78,10 @@ class RuntimeBuilder(Builder):
     def setup(self, gpg_key, echo=True):
         super(RuntimeBuilder, self).setup(gpg_key, echo=echo)
 
+        additional_args = []
+        if os.geteuid() != 0:
+            additional_args.append('--user')
+
         for runtime in self.metadata['runtimes']:
             # Add a remote for the runtimes we build
             gpg_filename = tempfile.mkstemp(prefix=runtime)[1]
@@ -85,19 +89,19 @@ class RuntimeBuilder(Builder):
                 os.unlink(gpg_filename)
             if command(['gpg', '--output', gpg_filename, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
                 raise Builder.Error('Failed to export GPG key')
-            command(['flatpak', 'remote-delete', '--user', '--force', 'liri-local'], echo=echo, output=echo)
-            if command(['flatpak', 'remote-add', '--user', 'liri-local', self.repo_path,
-                        '--title=Liri local development', '--gpg-import=' + gpg_filename], echo=echo, output=echo).returncode != 0:
+            command(['flatpak', 'remote-delete', '--force', 'liri-local'].extend(additional_args), echo=echo, output=echo)
+            if command(['flatpak', 'remote-add', 'liri-local', self.repo_path,
+                        '--title=Liri local development', '--gpg-import=' + gpg_filename].extend(additional_args), echo=echo, output=echo).returncode != 0:
                 raise Builder.Error('Failed to add liri-local remote')
 
             # Install dependencies
             for remote_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('remotes', []):
-                if command(['flatpak', 'remote-add', '--user', remote_dep['name'], '--from', remote_dep['location'], '--if-not-exists'], echo=echo, output=echo).returncode != 0:
+                if command(['flatpak', 'remote-add', remote_dep['name'], '--from', remote_dep['location'], '--if-not-exists'].extend(additional_args), echo=echo, output=echo).returncode != 0:
                     raise Builder.Error('Failed to add %s remote' % remote_dep['name'])
             for runtime_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('runtimes', []):
                 fullname = '%s//%s' % (runtime_dep['name'], runtime_dep['version'])
-                if command(['flatpak', 'update', '--user', '--runtime', fullname], echo=echo, output=echo).returncode != 0:
-                    if command(['flatpak', 'install', '--user', '--runtime', runtime_dep['remote'], fullname], echo=echo, output=echo).returncode != 0:
+                if command(['flatpak', 'update', '--runtime', fullname].extend(additional_args), echo=echo, output=echo).returncode != 0:
+                    if command(['flatpak', 'install', '--runtime', runtime_dep['remote'], fullname].extend(additional_args), echo=echo, output=echo).returncode != 0:
                         raise Builder.Error('Failed to install or update {name} {version}'.format(runtime_dep))
 
     def copy_files(self):
@@ -188,6 +192,10 @@ class RuntimeBuilder(Builder):
 
 class AppBuilder(RuntimeBuilder):
     def build_app(self, app, gpg_key, app_metadata, sdk_path, state_path, jobs=None, echo=True):
+        additional_args = []
+        if os.geteuid() != 0:
+            additional_args.append('--user')
+
         channel = self.metadata['channel']
         runtime = app_metadata['runtime']
         branch = app_metadata['branch']
@@ -208,8 +216,8 @@ class AppBuilder(RuntimeBuilder):
                     '--repo=' + self.repo_path, '--state-dir=' + state_path,
                     '--arch=' + self.arch, '--subject="%s"' % subject,
                     '--gpg-sign=' + gpg_key,
-                    '--install-deps-from=liri-local', '--user',
-                    sdk_path, os.path.join(self.temp_path, app + '.json')]
+                    '--install-deps-from=liri-local',
+                    sdk_path, os.path.join(self.temp_path, app + '.json')].extend(additional_args)
             if jobs is not None and isinstance(jobs, int):
                 argv.extend(['--jobs', str(jobs)])
             result = command(argv, echo=echo, output=echo)
