@@ -20,7 +20,7 @@ gpg_key="7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE"
 
 for t in runtime app; do
     msg "== Build $t"
-    ./flatpak-build build $metadata --type=$t --jobs=2 --gpg-key=$gpg_key
+    ./flatpak-build build $metadata --type=$t --gpg-key=$gpg_key
 
     msg "== Export"
     ./flatpak-build export --gpg-key=$gpg_key

@@ -262,6 +262,7 @@ class AppBuilder(RuntimeBuilder):
 
 if __name__ == '__main__':
     import argparse
+    import multiprocessing
     import sys
 
     ARCH = command(['flatpak', '--default-arch']).stdout.decode('utf-8').strip()
@@ -282,7 +283,7 @@ if __name__ == '__main__':
     parser_build.add_argument('--gpg-key', help='GPG key to sign commits',
                               action='store', type=str, required=True)
     parser_build.add_argument('--jobs', help='number of parallel jobs',
-                               action='store', type=int)
+                               action='store', type=int, default=multiprocessing.cpu_count())
     parser_build.add_argument('target', nargs='?', default=None)
 
     parser_export = subparsers.add_parser('export', help='export repositories')
