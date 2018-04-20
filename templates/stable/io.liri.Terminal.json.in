@@ -16,6 +16,31 @@
     ],
     "modules": [
         {
+            "name": "qtgsettings",
+            "buildsystem": "simple",
+            "build-commands": [
+                "./qbs-configure",
+                "./qbs-build qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "git://github.com/lirios/qtgsettings.git",
+                    "branch": "v1.2.0"
+                },
+                {
+                    "dest-filename": "qbs-configure",
+                    "path": "sources/qbs-configure",
+                    "type": "file"
+                },
+                {
+                    "dest-filename": "qbs-build",
+                    "path": "sources/qbs-build",
+                    "type": "file"
+                }
+            ]
+        },
+        {
             "name": "terminal",
             "buildsystem": "simple",
             "build-commands": [
