@@ -89,19 +89,31 @@ class RuntimeBuilder(Builder):
                 os.unlink(gpg_filename)
             if command(['gpg', '--output', gpg_filename, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
                 raise Builder.Error('Failed to export GPG key')
-            command(['flatpak', 'remote-delete', '--force', 'liri-local'].extend(additional_args), echo=echo, output=echo)
-            if command(['flatpak', 'remote-add', 'liri-local', self.repo_path,
-                        '--title=Liri local development', '--gpg-import=' + gpg_filename].extend(additional_args), echo=echo, output=echo).returncode != 0:
+
+            argv = ['flatpak', 'remote-delete', '--force', 'liri-local']
+            argv.extend(additional_args)
+            command(argv, echo=echo, output=echo)
+
+            argv = ['flatpak', 'remote-add', 'liri-local', self.repo_path,
+                    '--title=Liri local development', '--gpg-import=' + gpg_filename]
+            argv.extend(additional_args)
+            if command(argv, echo=echo, output=echo).returncode != 0:
                 raise Builder.Error('Failed to add liri-local remote')
 
             # Install dependencies
             for remote_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('remotes', []):
-                if command(['flatpak', 'remote-add', remote_dep['name'], '--from', remote_dep['location'], '--if-not-exists'].extend(additional_args), echo=echo, output=echo).returncode != 0:
+                argv = ['flatpak', 'remote-add', remote_dep['name'], '--from', remote_dep['location'], '--if-not-exists']
+                argv.extend(additional_args)
+                if command(argv, echo=echo, output=echo).returncode != 0:
                     raise Builder.Error('Failed to add %s remote' % remote_dep['name'])
             for runtime_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('runtimes', []):
                 fullname = '%s//%s' % (runtime_dep['name'], runtime_dep['version'])
-                if command(['flatpak', 'update', '--runtime', fullname].extend(additional_args), echo=echo, output=echo).returncode != 0:
-                    if command(['flatpak', 'install', '--runtime', runtime_dep['remote'], fullname].extend(additional_args), echo=echo, output=echo).returncode != 0:
+                argv = ['flatpak', 'update', '--runtime', fullname]
+                argv.extend(additional_args)
+                if command(argv, echo=echo, output=echo).returncode != 0:
+                    argv = ['flatpak', 'install', '--runtime', runtime_dep['remote'], fullname]
+                    argv.extend(additional_args)
+                    if command(argv, echo=echo, output=echo).returncode != 0:
                         raise Builder.Error('Failed to install or update {name} {version}'.format(runtime_dep))
 
     def copy_files(self):
@@ -217,7 +229,8 @@ class AppBuilder(RuntimeBuilder):
                     '--arch=' + self.arch, '--subject="%s"' % subject,
                     '--gpg-sign=' + gpg_key,
                     '--install-deps-from=liri-local',
-                    sdk_path, os.path.join(self.temp_path, app + '.json')].extend(additional_args)
+                    sdk_path, os.path.join(self.temp_path, app + '.json')]
+            argv.extend(additional_args)
             if jobs is not None and isinstance(jobs, int):
                 argv.extend(['--jobs', str(jobs)])
             result = command(argv, echo=echo, output=echo)
