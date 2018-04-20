@@ -19,7 +19,7 @@ metadata="--metadata=${channel}-metadata.yml"
 gpg_key="7D98B067FFEFDAA5F8941D4CDFA98DBF970012EE"
 
 msg "== Export"
-./flatpak-build export $metadata --gpg-key=$gpg_key
+./flatpak-build export --gpg-key=$gpg_key
 
 for t in runtime app; do
     msg "== Publish $t"

@@ -23,7 +23,7 @@ for t in runtime app; do
     ./flatpak-build build $metadata --type=$t --jobs=2 --gpg-key=$gpg_key
 
     msg "== Export"
-    ./flatpak-build export $metadata --gpg-key=$gpg_key
+    ./flatpak-build export --gpg-key=$gpg_key
 done
 
 for t in runtime app; do

@@ -292,8 +292,6 @@ if __name__ == '__main__':
     parser_build.add_argument('target', nargs='?', default=None)
 
     parser_export = subparsers.add_parser('export', help='export repositories')
-    parser_export.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
-                               type=argparse.FileType('r'), action='store', required=True)
     parser_export.add_argument('--arch', help='architecture (default {})'.format(ARCH),
                                action='store', default=ARCH)
     parser_export.add_argument('--gpg-key', help='GPG key to sign commits',
@@ -344,8 +342,9 @@ if __name__ == '__main__':
         else:
             builder = Builder()
         builder.arch = args.arch
-        builder.metadata_file = args.metadata
         builder.repo_path = os.path.abspath(args.repo)
+        if hasattr(args, 'metadata'):
+            builder.metadata_file = args.metadata
         if hasattr(args, 'target'):
             builder.build(args.target, args.gpg_key, jobs=args.jobs)
         elif hasattr(args, 'dest'):
