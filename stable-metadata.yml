@@ -26,9 +26,9 @@ apps:
   io.liri.Files:
     runtime: io.liri.Sdk
     branch: stable
-  io.liri.Installer:
-    runtime: io.liri.Sdk
-    branch: '3.1'
+#  io.liri.Installer:
+#    runtime: io.liri.Sdk
+#    branch: '3.1'
   io.liri.Terminal:
     runtime: io.liri.Sdk
     branch: stable
