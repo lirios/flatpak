@@ -1,7 +1,7 @@
-Liri apps platform and SDK for Flatpak
-=====
+# Flatpak runtime and apps
 
-This is the Liri platform and SDK to build Flatpak apps against.
+This repository contains the Liri platform and SDK for Flatpak
+plus the apps.
 
 ## Versioning
 
