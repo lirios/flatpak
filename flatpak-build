@@ -86,8 +86,7 @@ class RuntimeBuilder(Builder):
                 os.unlink(gpg_filename)
             if command(['gpg', '--output', gpg_filename, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
                 raise Builder.Error('Failed to export GPG key')
-            if command(['flatpak', 'remote-delete', '--user', '--force', 'liri-local'], echo=echo, output=echo).returncode != 0:
-                raise Builder.Error('Failed to aremove liri-local remote')
+            command(['flatpak', 'remote-delete', '--user', '--force', 'liri-local'], echo=echo, output=echo)
             if command(['flatpak', 'remote-add', '--user', 'liri-local', self.repo_path,
                         '--title=Liri local development', '--gpg-import=' + gpg_filename], echo=echo, output=echo).returncode != 0:
                 raise Builder.Error('Failed to add liri-local remote')
