@@ -15,6 +15,7 @@
         "--socket=x11",
         "--socket=wayland",
         "--filesystem=host",
+        "--device=dri",
         "--env=SESSION_MANAGER="
     ],
     "modules": [
