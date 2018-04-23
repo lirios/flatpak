@@ -82,7 +82,7 @@ class RuntimeBuilder(Builder):
         if os.geteuid() != 0:
             additional_args.append('--user')
 
-        for runtime in self.metadata['runtimes']:
+        if os.path.exists(self.repo_path):
             # Add a remote for the runtimes we build
             gpg_filename = tempfile.mkstemp(prefix=runtime)[1]
             if os.path.exists(gpg_filename):
@@ -100,6 +100,7 @@ class RuntimeBuilder(Builder):
             if command(argv, echo=echo, output=echo).returncode != 0:
                 raise Builder.Error('Failed to add liri-local remote')
 
+        for runtime in self.metadata['runtimes']:
             # Install dependencies
             for remote_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('remotes', []):
                 argv = ['flatpak', 'remote-add', remote_dep['name'], '--from', remote_dep['location'], '--if-not-exists']
