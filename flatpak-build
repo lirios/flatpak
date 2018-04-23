@@ -65,7 +65,7 @@ class Builder(object):
     def encode_gpg_key(self, gpg_key, echo=False):
         # Encode GPG key to base64
         gpgdata_path = os.path.join(self.temp_path, 'key.pgp')
-        if command(['gpg', '--output', gpgdata_path, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
+        if command(['gpg2', '--output', gpgdata_path, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
             raise Builder.Error('Failed to export GPG key')
         with open(gpgdata_path, 'rb') as f:
             return base64.b64encode(f.read())
@@ -87,7 +87,7 @@ class RuntimeBuilder(Builder):
             gpg_filename = tempfile.mkstemp(prefix=runtime)[1]
             if os.path.exists(gpg_filename):
                 os.unlink(gpg_filename)
-            if command(['gpg', '--output', gpg_filename, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
+            if command(['gpg2', '--output', gpg_filename, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
                 raise Builder.Error('Failed to export GPG key')
 
             argv = ['flatpak', 'remote-delete', '--force', 'liri-local']
