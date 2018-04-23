@@ -55,7 +55,7 @@ class Builder(object):
         if self.metadata is None:
             raise Builder.Error('Metadata was not loaded')
 
-    def build(self, target, gpg_key, jobs=None, echo=False, **kwargs):
+    def build(self, target, gpg_key, state_path, jobs=None, echo=False, **kwargs):
         self.setup(gpg_key)
 
     def export(self, gpg_key, echo=False, **kwargs):
@@ -169,11 +169,10 @@ class RuntimeBuilder(Builder):
             if result.returncode != 0:
                 raise Builder.Error('Build failed')
 
-    def build(self, target, gpg_key, jobs=None, echo=True, **kwargs):
+    def build(self, target, gpg_key, state_path, jobs=None, echo=True, **kwargs):
         self.setup(gpg_key)
 
         sdk_path = os.path.join(self.current_path, 'sdk')
-        state_path = os.path.join(self.current_path, '.flatpak-builder')
 
         if target is None:
             for runtime in self.metadata['runtimes']:
@@ -237,12 +236,11 @@ class AppBuilder(RuntimeBuilder):
             if result.returncode != 0:
                 raise Builder.Error('Build failed')
 
-    def build(self, target, gpg_key, jobs=None, echo=True, **kwargs):
+    def build(self, target, gpg_key, state_path, jobs=None, echo=True, **kwargs):
         self.setup(gpg_key)
         self.copy_files()
 
         sdk_path = os.path.join(self.current_path, 'sdk')
-        state_path = os.path.join(self.current_path, '.flatpak-builder')
 
         if target is None:
             for app in self.metadata.get('apps', []):
@@ -291,6 +289,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--repo', metavar='PATH', help='OSTree repository',
                         action='store', default='repo')
+    parser.add_argument('--state-dir', metavar='PATH', help='State directory',
+                        action='store', default=None)
 
     subparsers = parser.add_subparsers(title='subcommands', description='valid subcommands')
 
@@ -339,12 +339,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    current_path = os.path.abspath(os.path.dirname(__file__))
+
+    if args.state_dir is None:
+        state_path = os.path.join(current_path, '.flatpak-builder')
+    else:
+        state_path = args.state_dir
+
     if hasattr(args, 'full'):
-        current_path = os.path.abspath(os.path.dirname(__file__))
         sdk_path = os.path.join(current_path, 'sdk')
         if os.path.exists(sdk_path):
             shutil.rmtree(sdk_path)
-        state_path = os.path.join(current_path, '.flatpak-builder')
         if os.path.exists(state_path):
             shutil.rmtree(state_path)
         if args.full is True:
@@ -367,7 +372,7 @@ if __name__ == '__main__':
         if hasattr(args, 'metadata'):
             builder.metadata_file = args.metadata
         if hasattr(args, 'target'):
-            builder.build(args.target, args.gpg_key, jobs=args.jobs)
+            builder.build(args.target, args.gpg_key, state_path, jobs=args.jobs)
         elif hasattr(args, 'type') and hasattr(args, 'gpg_key'):
             builder.create_files(args.gpg_key, args.dest)
         elif hasattr(args, 'dest'):
