@@ -20,6 +20,8 @@ runtimes:
     modules:
       - modules/unstable/qbs.json
       - modules/unstable/qbs-shared.json
+      - modules/unstable/platformtheme.json
+      - modules/unstable/materialdecoration.json
       - modules/unstable/fluid.json
       - modules/unstable/os-release.json
 apps:

@@ -1,0 +1,28 @@
+{
+     "name": "platformtheme",
+     "buildsystem": "simple",
+     "build-commands": [
+         "./qbs-configure",
+         "./qbs-build qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/usr"
+     ],
+     "cleanup-platform": [
+         "/bin"
+     ],
+     "sources": [
+         {
+             "type": "git",
+             "url": "git://github.com/lirios/platformtheme.git",
+             "branch": "develop"
+         },
+         {
+             "type": "file",
+             "path": "sources/qbs-configure",
+             "dest-filename": "qbs-configure"
+         },
+         {
+             "type": "file",
+             "path": "sources/qbs-build",
+             "dest-filename": "qbs-build"
+         }
+     ]
+}
