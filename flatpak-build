@@ -84,7 +84,7 @@ class RuntimeBuilder(Builder):
 
         if os.path.exists(self.repo_path):
             # Add a remote for the runtimes we build
-            gpg_filename = tempfile.mkstemp(prefix=runtime)[1]
+            gpg_filename = tempfile.mkstemp(prefix=str(os.getpid()))[1]
             if os.path.exists(gpg_filename):
                 os.unlink(gpg_filename)
             if command(['gpg2', '--output', gpg_filename, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
