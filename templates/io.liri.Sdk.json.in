@@ -57,6 +57,8 @@
         "--env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/share",
         "--env=QT_PLUGIN_PATH=/app/lib64/plugins:/app/lib/plugins:/usr/share/runtime/lib/plugins",
         "--env=QML2_IMPORT_PATH=/app/lib64/qml:/app/lib/qml",
+        "--env=QT_QPA_PLATFORMTHEME=flatpak",
+        "--env=QT_QPA_FLATPAK_PLATFORMTHEME=liri",
         "--env=DCONF_USER_CONFIG_DIR=.config/dconf",
         "--filesystem=xdg-run/dconf",
         "--filesystem=~/.config/dconf:ro",
