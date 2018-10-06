@@ -1,0 +1,48 @@
+id: io.liri.Terminal
+branch: master
+runtime: org.kde.Platform
+runtime-version: "5.11"
+sdk: org.kde.Sdk
+base: io.liri.BaseApp
+base-version: master
+command: liri-terminal
+tags:
+  - nightly
+desktop-file-name-suffix: " (Nightly)"
+finish-args:
+  - --device=dri
+  - --filesystem=host
+  - --filesystem=xdg-run/dconf
+  - --filesystem=xdg-config/dconf:ro
+  - --socket=wayland
+  - --socket=x11
+  - --share=ipc
+  - --talk-name=ca.desrt.dconf
+  - --talk-name=org.freedesktop.Notifications
+  - --env=DCONF_USER_CONFIG_DIR=.config/dconf
+modules:
+  - name: qtgsettings
+    buildsystem: simple
+    build-commands:
+      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
+      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
+      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
+      - qbs config --settings-dir .qbs-settings --list
+      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app
+    sources:
+      - type: git
+        url: git://github.com/lirios/qtgsettings.git
+        branch: develop
+
+  - name: terminal
+    buildsystem: simple
+    build-commands:
+      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
+      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
+      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
+      - qbs config --settings-dir .qbs-settings --list
+      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app
+    sources:
+      - type: git
+        url: git://github.com/lirios/terminal.git
+        branch: develop

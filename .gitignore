@@ -2,6 +2,6 @@ __pycache__
 *.py[co]
 *.swp
 .flatpak-builder/
+build/
 repo/
-sdk/
 key.gpg*

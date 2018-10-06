@@ -1,0 +1,29 @@
+id: io.liri.Fluid.Demo
+branch: master
+runtime: org.kde.Platform
+runtime-version: "5.11"
+sdk: org.kde.Sdk
+base: io.liri.BaseApp
+base-version: "5.11"
+command: fluid-demo
+tags:
+  - nightly
+desktop-file-name-suffix: " (Nightly)"
+finish-args:
+  - --device=dri
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+modules:
+  - name: fluid
+    buildsystem: simple
+    build-commands:
+      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
+      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
+      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
+      - qbs config --settings-dir .qbs-settings --list
+      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app project.useSystemQbsShared:true project.withDemo:true project.withDocumentation:false project.withQmlModules:false project.deploymentEnabled:false
+    sources:
+      - type: git
+        url: git://github.com/lirios/fluid.git
+        branch: develop

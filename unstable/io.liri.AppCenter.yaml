@@ -1,0 +1,122 @@
+id: io.liri.AppCenter
+branch: master
+runtime: org.kde.Platform
+runtime-version: "5.11"
+sdk: org.kde.Sdk
+base: io.liri.BaseApp
+base-version: master
+command: liri-appcenter
+tags:
+  - nightly
+desktop-file-name-suffix: " (Nightly)"
+finish-args:
+  - --device=dri
+  - --filesystem=~/.local/share/flatpak
+  - --filesystem=/var/lib/flatpak
+  - --filesystem=xdg-run/dconf
+  - --filesystem=~/.config/dconf:ro
+  - --socket=wayland
+  - --socket=x11
+  - --share=ipc
+  - --share=network
+  - --talk-name=ca.desrt.dconf
+  - --env=DCONF_USER_CONFIG_DIR=.config/dconf
+modules:
+  - name: libfuse
+    cleanup:
+      - /bin
+    config-opts:
+      - --disable-util
+    sources:
+      - type: archive
+        url: https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz
+        sha256: 832432d1ad4f833c20e13b57cf40ce5277a9d33e483205fc63c78111b3358874
+
+  - name: ostree
+    build-options:
+      env:
+        BASH_COMPLETIONSDIR: /app/share/bash-completion/completions
+    cleanup:
+      - /bin
+      - /etc/grub.d
+      - /share/bash-completion
+      - /libexec
+    config-opts:
+      - --disable-man
+    sources:
+      - type: git
+        url: git://github.com/ostreedev/ostree.git
+        branch: v2018.4
+
+  - name: appstream
+    config-opts:
+      - --libdir=lib
+      - -Denable-qt=true
+      - -Dstemming=false
+    buildsystem: meson
+    builddir: true
+    sources:
+      - type: git
+        url: git://github.com/ximion/appstream.git
+        branch: 9c11ba6973fc8a0b0ff59f28bafb84ebea154a9d
+
+  - name: flatpak
+    config-opts:
+      - --disable-documentation
+      - --disable-seccomp
+      - --disable-sandboxed-triggers
+      - --disable-system-helper
+    make-args:
+      - XDG_APP_BINDIR=/usr/bin
+    cleanup:
+      - /etc/profile.d
+      - /libexec
+      - /lib/systemd
+      - /share/dbus-1/interfaces/org.freedesktop.*
+      - /share/dbus-1/services/org.freedesktop.*
+      - /share/gdm
+    sources:
+      - type: git
+        url: git://github.com/flatpak/flatpak
+        branch: 0.11.3
+    post-install:
+      - cp /usr/bin/gtk-update-icon-cache /app/bin
+      - cp /usr/bin/update-mime-database /app/bin
+      - cp /usr/bin/update-desktop-database /app/bin
+
+  - name: libqtxdg
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DQTXDGX_ICONENGINEPLUGIN_INSTALL_PATH=/app/lib/plugins/iconengines/libQt5XdgIconPlugin.so
+    sources:
+      - type: git
+        url: git://github.com/lxqt/libqtxdg.git
+        branch: "3.1.0"
+
+  - name: libliri
+    buildsystem: simple
+    build-commands:
+      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
+      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
+      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
+      - qbs config --settings-dir .qbs-settings --list
+      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app
+    cleanup:
+      - /share/qbs
+    sources:
+      - type: git
+        url: git://github.com/lirios/libliri.git
+        branch: develop
+
+  - name: appcenter
+    buildsystem: simple
+    build-commands:
+      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
+      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
+      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
+      - qbs config --settings-dir .qbs-settings --list
+      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app
+    sources:
+      - type: git
+        url: git://github.com/lirios/appcenter.git
+        branch: develop

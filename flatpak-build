@@ -23,363 +23,97 @@
 # $END_LICENSE$
 #
 
-from utilities import command, rsync
+from utilities import command
 
 import base64
 import datetime
 import os
-import json
-import yaml
-import shutil
 import tempfile
 
 
 class Builder(object):
-    arch = None
-    metadata_file = None
-    metadata = None
-    current_path = os.path.abspath(os.path.dirname(__file__))
-    temp_path = '/tmp/liri-flatpak'
-    repo_path = None
-
     class Error(Exception):
         pass
 
-    def prepare(self):
-        if self.metadata_file is None:
-            raise Builder.Error('Metadata file was not specified')
-        self.metadata = yaml.load(self.metadata_file.read())
+    def __init__(self, repo_path=None, state_path=None, channel={}):
+        self.repo_path = repo_path
+        self.state_path = state_path
+        self.channel = channel
 
-    def setup(self, gpg_key, echo=False):
-        self.prepare()
-        if self.metadata is None:
-            raise Builder.Error('Metadata was not loaded')
+    def build(self, arch=None, jobs=None):
+        # Install the flathub remote
+        command(['flatpak', 'remote-add', 'flathub', '--from', 'https://flathub.org/repo/flathub.flatpakrepo', '--user', '--if-not-exists'])
+        # Build apps
+        for filename in self.channel.get('apps', []):
+            app_id = os.path.basename(filename).replace('.yaml', '')
+            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            subject = 'Build of %s at %s' % (app_id, now)
+            argv = ['flatpak-builder', '--ccache', '--force-clean', '--install-deps-from=flathub',
+                    '--subject=' + subject,
+                    '--install', '--user']
+            if self.repo_path:
+                argv += ['--repo=' + self.repo_path]
+            if self.state_path:
+                argv += ['--state-dir=' + self.state_path]
+            if arch:
+                argv += ['--arch=' + arch]
+            if jobs:
+                argv += ['--jobs=' + str(jobs)]
+            argv += ['build', filename]
+            if command(argv, echo=True, output=True).returncode != 0:
+                raise Builder.Error('Failed to build ' + app_id)
 
-    def build(self, target, gpg_key, state_path, jobs=None, echo=False, **kwargs):
-        self.setup(gpg_key)
-
-    def export(self, gpg_key, echo=False, **kwargs):
-        if command(['flatpak', 'build-update-repo', self.repo_path, '--gpg-sign=' + gpg_key, '--prune', '--prune-depth=20'], echo=echo, output=echo).returncode != 0:
-            raise Builder.Error('Failed to export OSTree repository')
-
-    def encode_gpg_key(self, gpg_key, echo=False):
-        # Encode GPG key to base64
-        gpgdata_path = os.path.join(self.temp_path, 'key.pgp')
-        if command(['gpg2', '--output', gpgdata_path, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
+    def export(self, gpg_homedir=None, gpg_sign=None):
+        # Export GPG key to a file
+        gpg_filename = tempfile.mkstemp(prefix=str(os.getpid()))[1]
+        if os.path.exists(gpg_filename):
+            os.unlink(gpg_filename)
+        if command(['gpg2', '--output', gpg_filename, '--export', gpg_sign], echo=True, output=True).returncode != 0:
             raise Builder.Error('Failed to export GPG key')
-        with open(gpgdata_path, 'rb') as f:
-            return base64.b64encode(f.read())
-
-    def sync(self, dest_url, echo=False, **kwargs):
-        rsync(os.path.join(self.repo_path, ''), os.path.join(dest_url, 'repo'), None, [])
-
-
-class RuntimeBuilder(Builder):
-    def setup(self, gpg_key, echo=True):
-        super(RuntimeBuilder, self).setup(gpg_key, echo=echo)
-
-        additional_args = []
-        if os.geteuid() != 0:
-            additional_args.append('--user')
-
-        if os.path.exists(self.repo_path):
-            # Add a remote for the runtimes we build
-            gpg_filename = tempfile.mkstemp(prefix=str(os.getpid()))[1]
-            if os.path.exists(gpg_filename):
-                os.unlink(gpg_filename)
-            if command(['gpg2', '--output', gpg_filename, '--export', gpg_key], echo=echo, output=echo).returncode != 0:
-                raise Builder.Error('Failed to export GPG key')
-
-            argv = ['flatpak', 'remote-delete', '--force', 'liri-local']
-            argv.extend(additional_args)
-            command(argv, echo=echo, output=echo)
-
-            argv = ['flatpak', 'remote-add', 'liri-local', self.repo_path,
-                    '--title=Liri local development', '--gpg-import=' + gpg_filename]
-            argv.extend(additional_args)
-            if command(argv, echo=echo, output=echo).returncode != 0:
-                raise Builder.Error('Failed to add liri-local remote')
-
-        for runtime in self.metadata['runtimes']:
-            # Install dependencies
-            for remote_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('remotes', []):
-                argv = ['flatpak', 'remote-add', remote_dep['name'], '--from', remote_dep['location'], '--if-not-exists']
-                argv.extend(additional_args)
-                if command(argv, echo=echo, output=echo).returncode != 0:
-                    raise Builder.Error('Failed to add %s remote' % remote_dep['name'])
-            for runtime_dep in self.metadata['runtimes'][runtime].get('dependencies', {}).get('runtimes', []):
-                fullname = '%s//%s' % (runtime_dep['name'], runtime_dep['version'])
-                argv = ['flatpak', 'update', '--runtime', fullname]
-                argv.extend(additional_args)
-                if command(argv, echo=echo, output=echo).returncode != 0:
-                    argv = ['flatpak', 'install', '--runtime', runtime_dep['remote'], fullname]
-                    argv.extend(additional_args)
-                    if command(argv, echo=echo, output=echo).returncode != 0:
-                        raise Builder.Error('Failed to install or update {name} {version}'.format(runtime_dep))
-
-    def copy_files(self):
-        if os.path.exists(self.temp_path):
-            shutil.rmtree(self.temp_path)
-        os.makedirs(self.temp_path)
-        for dirname in ('templates', 'sources', 'patches'):
-            shutil.copytree(os.path.join(self.current_path, dirname), os.path.join(self.temp_path, dirname))
-
-    def build_runtime(self, runtime, gpg_key, sdk_path, state_path, jobs=None, echo=True):
-        modules_list = []
-        for module in self.metadata['runtimes'][runtime].get('modules', []):
-            with open(os.path.join(self.current_path, module), 'r') as module_file:
-                module_text = module_file.read()
-                module_text = module_text.replace('@@RUNTIME_ARCH@', self.arch)
-                module_text = module_text.replace('@@RUNTIME_BRANCH@', self.metadata['runtimes'][runtime]['branch'])
-                module_text = module_text.replace('@@BASE_RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['base-runtime-branch'])
-                module_data = json.loads(module_text)
-                modules_list.append(module_data)
-
-        with open(os.path.join(self.current_path, 'templates/%s.json.in' % runtime), 'r') as template_file:
-            runtime_text = template_file.read()
-            runtime_text = runtime_text.replace('@@RUNTIME_ARCH@@', self.arch)
-            runtime_text = runtime_text.replace('@@RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['branch'])
-            runtime_text = runtime_text.replace('@@BASE_RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['base-runtime-branch'])
-            runtime_data = json.loads(runtime_text)
-            runtime_data['modules'] = modules_list
-
-            self.copy_files()
-
-            with open(os.path.join(self.temp_path, '%s.json' % runtime), 'w') as metadata_file:
-                metadata_file.write(json.dumps(runtime_data))
-            for appdata in self.metadata['runtimes'][runtime].get('appdata', []):
-                with open(os.path.join(self.temp_path, appdata), 'w') as appdata_file:
-                    f = open(os.path.join(self.current_path, 'templates/%s.in' % appdata), 'r')
-                    contents = f.read()
-                    contents = contents.replace('@@RUNTIME_ARCH@@', self.arch)
-                    contents = contents.replace('@@RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['branch'])
-                    f.close()
-                    appdata_file.write(contents)
-
-            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            subject = 'Build of %s at %s' % (runtime, now)
-
-            argv = ['flatpak-builder', '--verbose', '--ccache', '--force-clean', '--require-changes',
-                    '--repo=' + self.repo_path, '--state-dir=' + state_path,
-                    '--arch=' + self.arch, '--subject="%s"' % subject,
-                    '--gpg-sign=' + gpg_key,
-                    sdk_path, os.path.join(self.temp_path, runtime + '.json')]
-            if jobs is not None and isinstance(jobs, int):
-                argv.extend(['--jobs', str(jobs)])
-            result = command(argv, echo=echo, output=echo)
-            if result.returncode != 0:
-                raise Builder.Error('Build failed')
-
-    def build(self, target, gpg_key, state_path, jobs=None, echo=True, **kwargs):
-        self.setup(gpg_key)
-
-        sdk_path = os.path.join(self.current_path, 'sdk')
-
-        if target is None:
-            for runtime in self.metadata['runtimes']:
-                self.build_runtime(runtime, gpg_key, sdk_path, state_path, jobs=jobs, echo=echo)
-        else:
-            if target not in self.metadata['runtimes']:
-                raise Builder.Error('Unknown runtime ' + target)
-            self.build_runtime(target, gpg_key, sdk_path, state_path, jobs=jobs, echo=echo)
-
-    def export(self, gpg_key, echo=True, **kwargs):
-        super(RuntimeBuilder, self).export(gpg_key, echo=echo, **kwargs)
-
-    def create_files(self, gpg_key, dest_path, echo=True):
-        self.prepare()
-        self.copy_files()
-
-        # Add GPG key to flatpakrepo files
-        gpgdata_base64 = self.encode_gpg_key(gpg_key, echo=echo)
-        for runtime in self.metadata['runtimes']:
-            with open(os.path.join(self.current_path, 'templates', self.metadata['channel'], runtime + '.flatpakrepo.in'), 'r') as src_file:
-                filename = runtime + '-' + self.metadata['channel'] + '.flatpakrepo'
-                temp_path = os.path.join(self.temp_path, filename)
-                with open(temp_path, 'w') as dest_file:
-                    dest_file.write(src_file.read())
-                    dest_file.write('GPGKey=%s\n' % gpgdata_base64.decode('ascii'))
-                shutil.copyfile(temp_path, os.path.join(dest_path, filename))
-
-
-class AppBuilder(RuntimeBuilder):
-    def build_app(self, app, gpg_key, app_metadata, sdk_path, state_path, jobs=None, echo=True):
-        additional_args = []
-        if os.geteuid() != 0:
-            additional_args.append('--user')
-
-        channel = self.metadata['channel']
-        runtime = app_metadata['runtime']
-        branch = app_metadata['branch']
-
-        with open(os.path.join(self.current_path, 'templates/%s/%s.json.in' % (channel, app)), 'r') as template_file:
-            app_text = template_file.read()
-            app_text = app_text.replace('@@RUNTIME_ARCH@@', self.arch)
-            app_text = app_text.replace('@@RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['branch'])
-            app_text = app_text.replace('@@BASE_RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['base-runtime-branch'])
-            app_text = app_text.replace('@@APP_BRANCH@@', branch)
-            with open(os.path.join(self.temp_path, app + '.json'), 'w') as f:
-                f.write(app_text)
-
-            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            subject = 'Build of %s at %s' % (app, now)
-
-            argv = ['flatpak-builder', '--verbose', '--ccache', '--force-clean', '--require-changes',
-                    '--repo=' + self.repo_path, '--state-dir=' + state_path,
-                    '--arch=' + self.arch, '--subject="%s"' % subject,
-                    '--gpg-sign=' + gpg_key,
-                    '--install-deps-from=liri-local',
-                    sdk_path, os.path.join(self.temp_path, app + '.json')]
-            argv.extend(additional_args)
-            if jobs is not None and isinstance(jobs, int):
-                argv.extend(['--jobs', str(jobs)])
-            result = command(argv, echo=echo, output=echo)
-            if result.returncode != 0:
-                raise Builder.Error('Build failed')
-
-    def build(self, target, gpg_key, state_path, jobs=None, echo=True, **kwargs):
-        self.setup(gpg_key)
-        self.copy_files()
-
-        sdk_path = os.path.join(self.current_path, 'sdk')
-
-        if target is None:
-            for app in self.metadata.get('apps', []):
-                self.build_app(app, gpg_key, self.metadata['apps'][app], sdk_path, state_path, jobs=jobs, echo=echo)
-        else:
-            if target not in self.metadata.get('apps', []):
-                raise Builder.Error('Unknown app ' + target)
-            self.build_app(target, gpg_key, self.metadata['apps'][target], sdk_path, state_path, jobs=jobs, echo=echo)
-
-    def create_files(self, gpg_key, dest_path, echo=True):
-        self.prepare()
-        self.copy_files()
-
-        # Add GPG key to flatpakref files
-        gpgdata_base64 = self.encode_gpg_key(gpg_key, echo=echo)
-        for app in self.metadata.get('apps', []):
-            channel = self.metadata['channel']
-            app_metadata = self.metadata['apps'][app]
-            runtime = app_metadata['runtime']
-            branch = app_metadata['branch']
-
-            with open(os.path.join(self.current_path, 'templates', channel, app + '.flatpakref.in'), 'r') as src_file:
-                filename = app + '-' + channel + '.flatpakref'
-                temp_path = os.path.join(self.temp_path, filename)
-
-                contents = src_file.read()
-                contents = contents.replace('@@RUNTIME_ARCH@@', self.arch)
-                contents = contents.replace('@@RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['branch'])
-                contents = contents.replace('@@BASE_RUNTIME_BRANCH@@', self.metadata['runtimes'][runtime]['base-runtime-branch'])
-                contents = contents.replace('@@APP_BRANCH@@', branch)
-
-                with open(temp_path, 'w') as dest_file:
-                    dest_file.write(contents)
-                    dest_file.write('GPGKey=%s\n' % gpgdata_base64.decode('ascii'))
-
-                shutil.copyfile(temp_path, os.path.join(dest_path, filename))
+        # Export repository
+        argv = ['flatpak', 'build-update-repo', self.repo_path, '--gpg-import=' + gpg_filename,
+                '--gpg-sign=' + gpg_sign, '--generate-static-deltas', '--prune', '--title=Liri']
+        if gpg_homedir:
+            argv += ['--gpg-homedir=' + gpg_homedir]
+        if command(argv, echo=True, output=True).returncode != 0:
+            raise Builder.Error('Failed to export')
 
 
 if __name__ == '__main__':
     import argparse
     import multiprocessing
+    import yaml
     import sys
 
     ARCH = command(['flatpak', '--default-arch']).stdout.decode('utf-8').strip()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--repo', metavar='PATH', help='OSTree repository',
-                        action='store', default='repo')
+                        action='store', default=None)
     parser.add_argument('--state-dir', metavar='PATH', help='State directory',
                         action='store', default=None)
-
-    subparsers = parser.add_subparsers(title='subcommands', description='valid subcommands')
-
-    parser_build = subparsers.add_parser('build', help='build runtime or apps')
-    parser_build.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
-                              type=argparse.FileType('r'), action='store', required=True)
-    parser_build.add_argument('--arch', help='architecture (default {})'.format(ARCH),
-                              action='store', default=ARCH)
-    parser_build.add_argument('--type', help='target type',
-                              type=str, choices=['runtime', 'app'], required=True)
-    parser_build.add_argument('--gpg-key', help='GPG key to sign commits',
-                              action='store', type=str, required=True)
-    parser_build.add_argument('--jobs', help='number of parallel jobs',
-                               action='store', type=int, default=multiprocessing.cpu_count())
-    parser_build.add_argument('target', nargs='?', default=None)
-
-    parser_export = subparsers.add_parser('export', help='export repositories')
-    parser_export.add_argument('--arch', help='architecture (default {})'.format(ARCH),
-                               action='store', default=ARCH)
-    parser_export.add_argument('--gpg-key', help='GPG key to sign commits',
-                               action='store', type=str, required=True)
-
-    parser_sync = subparsers.add_parser('sync', help='synchronize repositories')
-    parser_sync.add_argument('--dest', help='destination',
-                             action='store', type=str, required=True)
-    parser_sync.add_argument('--rsync-opts', help='additional rsync options (parsed via shell)',
-                             action='store', default=None)
-    parser_sync.add_argument('--rsync-opt', help='additional (single) rsync option',
-                             action='append', default=[])
-
-    parser_files = subparsers.add_parser('files', help='create files')
-    parser_files.add_argument('--metadata', metavar='PATH', help='alternative metadata file',
-                              type=argparse.FileType('r'), action='store', required=True)
-    parser_files.add_argument('--arch', help='architecture (default {})'.format(ARCH),
-                              action='store', default=ARCH)
-    parser_files.add_argument('--type', help='target type',
-                              type=str, choices=['runtime', 'app'], required=True)
-    parser_files.add_argument('--gpg-key', help='GPG key to sign commits',
-                              action='store', type=str, required=True)
-    parser_files.add_argument('--dest', help='destination',
-                              action='store', type=str, required=True)
-
-    parser_clean = subparsers.add_parser('clean', help='remove binary files')
-    parser_clean.add_argument('--full', help='remove sources, builds and OSTree repositories',
-                              action='store_true')
+    parser.add_argument('--channel', metavar='PATH', help='channel file',
+                        type=argparse.FileType('r'), action='store', required=True)
+    parser.add_argument('--arch', help='architecture (default {})'.format(ARCH),
+                        action='store', default=ARCH)
+    parser.add_argument('--jobs', help='number of parallel jobs',
+                        action='store', type=int, default=None)
+    parser.add_argument('--export', help='export repository',
+                        action='store_true')
+    parser.add_argument('--gpg-homedir', help='GPG directory to use when looking for keyrings',
+                        action='store', type=str)
+    parser.add_argument('--gpg-sign', help='GPG key to sign commits',
+                        action='store', type=str)
 
     args = parser.parse_args()
 
-    current_path = os.path.abspath(os.path.dirname(__file__))
-
-    if args.state_dir is None:
-        state_path = os.path.join(current_path, '.flatpak-builder')
-    else:
-        state_path = args.state_dir
-
-    if hasattr(args, 'full'):
-        sdk_path = os.path.join(current_path, 'sdk')
-        if os.path.exists(sdk_path):
-            shutil.rmtree(sdk_path)
-        if os.path.exists(state_path):
-            shutil.rmtree(state_path)
-        if args.full is True:
-            repo_path = os.path.abspath(args.repo)
-            if os.path.exists(repo_path):
-                shutil.rmtree(repo_path)
-        sys.exit(0)
-
-    try:
-        if hasattr(args, 'type'):
-            if args.type == 'runtime':
-                builder = RuntimeBuilder()
-            else:
-                builder = AppBuilder()
-        else:
-            builder = Builder()
-        builder.repo_path = os.path.abspath(args.repo)
-        if hasattr(args, 'arch'):
-            builder.arch = args.arch
-        if hasattr(args, 'metadata'):
-            builder.metadata_file = args.metadata
-        if hasattr(args, 'target'):
-            builder.build(args.target, args.gpg_key, state_path, jobs=args.jobs)
-        elif hasattr(args, 'type') and hasattr(args, 'gpg_key'):
-            builder.create_files(args.gpg_key, args.dest)
-        elif hasattr(args, 'dest'):
-            builder.sync(args.dest)
-        elif hasattr(args, 'gpg_key'):
-            builder.export(args.gpg_key, echo=True)
-    except Builder.Error as e:
-        sys.stderr.write(e.args[0] + '\n')
+    if args.export is True and not (args.repo and args.gpg_sign):
+        print('Export requires --repo and --gpg-sign', file=sys.stderr)
         sys.exit(1)
+
+    channel = yaml.load(args.channel)
+
+    builder = Builder(repo_path=args.repo, state_path=args.state_dir, channel=channel)
+    builder.build(arch=args.arch, jobs=args.jobs)
+    if args.export is True:
+        builder.export(gpg_homedir=args.gpg_homedir, gpg_sign=args.gpg_sign)

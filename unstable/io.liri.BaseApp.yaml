@@ -1,0 +1,44 @@
+id: io.liri.BaseApp
+branch: master
+runtime: org.kde.Platform
+sdk: org.kde.Sdk
+runtime-version: "5.11"
+separate-locales: false
+modules:
+  - name: qbs
+    sources:
+      - type: git
+        url: git://code.qt.io/qbs/qbs.git
+        branch: "v1.12.1"
+      - type: patch
+        path: ../patches/0001-File-existence-check-on-Flatpak-and-OSTree.patch
+      - type: script
+        dest-filename: configure
+        commands:
+          - qmake QBS_INSTALL_PREFIX=/app CONFIG+=qbs_enable_project_file_updates qbs.pro
+
+  - name: qbs-shared
+    buildsystem: simple
+    build-commands:
+      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
+      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
+      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
+      - qbs config --settings-dir .qbs-settings --list
+      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ project.prefix:/app
+    sources:
+      - type: git
+        url: git://github.com/lirios/qbs-shared.git
+        branch: develop
+
+  - name: fluid
+    buildsystem: simple
+    build-commands:
+      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
+      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
+      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
+      - qbs config --settings-dir .qbs-settings --list
+      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app project.useSystemQbsShared:true project.withDemo:false project.withDocumentation:false
+    sources:
+      - type: git
+        url: git://github.com/lirios/fluid.git
+        branch: develop

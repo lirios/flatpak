@@ -1,7 +1,0 @@
-[Flatpak Repo]
-Title=Liri Nightly Runtimes
-Url=https://repo.liri.io/flatpak/repo/
-Homepage=https://liri.io/
-Comment=Nightly Liri runtime
-Description=Liri develops modern free software apps suited for daily desktop usage. This repository includes development builds of the Liri runtime.
-Icon=https://liri.io/images/logo-100.png

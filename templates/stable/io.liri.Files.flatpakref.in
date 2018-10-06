@@ -1,7 +1,0 @@
-[Flatpak Ref]
-Title=Liri Files
-Name=io.liri.Files
-Branch=@@APP_BRANCH@@
-Url=https://repo.liri.io/flatpak/repo/
-IsRuntime=False
-RuntimeRepo=https://repo.liri.io/flatpak/files/io.liri.Sdk-stable.flatpakrepo
