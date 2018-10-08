@@ -40,7 +40,7 @@ class Builder(object):
         self.state_path = state_path
         self.channel = channel
 
-    def build(self, arch=None, jobs=None):
+    def build(self, arch=None, jobs=None, gpg_homedir=None, gpg_sign=None):
         # Install the flathub remote
         command(['flatpak', 'remote-add', 'flathub', '--from', 'https://flathub.org/repo/flathub.flatpakrepo', '--user', '--if-not-exists'])
         # Build apps
@@ -64,6 +64,21 @@ class Builder(object):
                 raise Builder.Error('Failed to build ' + app_id)
 
     def export(self, gpg_homedir=None, gpg_sign=None):
+        # Export all apps
+        for filename in self.channel.get('apps', []):
+            argv = ['flatpak-builder', '--force-clean']
+            if self.repo_path:
+                argv += ['--repo=' + self.repo_path]
+            if self.state_path:
+                argv += ['--state-dir=' + self.state_path]
+            if gpg_homedir:
+                argv += ['--gpg-homedir=' + gpg_homedir]
+            if gpg_sign:
+                argv += ['--gpg-sign=' + gpg_sign]
+            argv += ['build', filename]
+            if command(argv, echo=True, output=True).returncode != 0:
+                raise Builder.Error('Failed to export ' + app_id)
+
         # Export GPG key to a file
         gpg_filename = tempfile.mkstemp(prefix=str(os.getpid()))[1]
         if os.path.exists(gpg_filename):
@@ -114,6 +129,6 @@ if __name__ == '__main__':
     channel = yaml.load(args.channel)
 
     builder = Builder(repo_path=args.repo, state_path=args.state_dir, channel=channel)
-    builder.build(arch=args.arch, jobs=args.jobs)
+    builder.build(arch=args.arch, jobs=args.jobs, gpg_homedir=args.gpg_homedir, gpg_sign=args.gpg_sign)
     if args.export is True:
         builder.export(gpg_homedir=args.gpg_homedir, gpg_sign=args.gpg_sign)
