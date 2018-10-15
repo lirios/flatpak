@@ -27,8 +27,8 @@ modules:
       - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ project.prefix:/app
     sources:
       - type: archive
-        url: https://github.com/lirios/qbs-shared/releases/download/v1.2.0/liri-qbs-shared-1.2.0.tar.xz
-        sha256: 1cbf3475bef23f3533bb164ad9eda7042d488a0e7a6a954b48cfb4c8cee1d1aa
+        url: https://github.com/lirios/qbs-shared/releases/download/v1.3.0/liri-qbs-shared-1.3.0.tar.xz
+        sha256: 0eb41b669c894ba289917e04f575e996692f2382b06d9545aab2f06d85fc544c
 
   - name: fluid
     buildsystem: simple
