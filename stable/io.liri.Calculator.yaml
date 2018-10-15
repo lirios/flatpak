@@ -22,5 +22,5 @@ modules:
       - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app
     sources:
       - type: archive
-        url: https://github.com/lirios/calculator/releases/download/v1.1.0/liri-calculator-1.1.0.tar.xz
-        sha256: 5ed0b2b0b625ec47567186a735e9f8bcd4d319b58534faa0f2a4ba7f161bf586
+        url: https://github.com/lirios/calculator/releases/download/v1.1.1/liri-calculator-1.1.1.tar.xz
+        sha256: dc6d7c271371e261e386bdd2de7ea65030240b86ef5400c59d78b8bd751f4ba4
