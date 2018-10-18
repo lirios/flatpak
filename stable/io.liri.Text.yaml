@@ -23,5 +23,5 @@ modules:
       - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app
     sources:
       - type: archive
-        url: https://github.com/lirios/text/releases/download/v0.4.0/liri-text-0.4.0.tar.xz
-        sha256: d48a2d4b40b704507a14d91376656b00e13a495fa1f6e19bf10e45154d652bcd
+        url: https://github.com/lirios/text/releases/download/v0.4.1/liri-text-0.4.1.tar.xz
+        sha256: 4cdfd5a9c178f791a7fb82a4b6cad9927ae68bfb9a428410b9b162843a46e5e6
