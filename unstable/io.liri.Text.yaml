@@ -23,7 +23,7 @@ modules:
       - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
       - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
       - qbs config --settings-dir .qbs-settings --list
-      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.lirideployment.prefix:/app
+      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.qbs.installPrefix:"" modules.lirideployment.prefix:/app
     sources:
       - type: git
         url: git://github.com/lirios/text.git
