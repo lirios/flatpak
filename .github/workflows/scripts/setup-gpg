@@ -1,0 +1,21 @@
+#!/bin/bash
+# SPDX-FileCopyrightText: 2020 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+set -e
+
+export GNUPGHOME=${HOME}/.gnupg
+
+mkdir -m 700 -p ${GNUPGHOME}
+printf "${CI_GPG_KEY}" | base64 --decode > ${GNUPGHOME}/private.key
+gpg --batch --import ${GNUPGHOME}/private.key
+
+cat > ${GNUPGHOME}/gpg.conf <<EOF
+use-agent
+pinentry-mode loopback
+passphrase ${CI_GPG_PASSPHRASE}
+no-tty
+batch
+yes
+EOF

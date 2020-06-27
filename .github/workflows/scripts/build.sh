@@ -17,6 +17,8 @@ flatpak remote-add flathub --from https://flathub.org/repo/flathub.flatpakrepo -
 now=$(date +"%Y-%m-%d %H:%M:%S")
 
 flatpak-builder build ${app_id}.yaml \
+    --gpg-sign=${CI_GPG_KEYID} \
+    --gpg-homedir=${HOME}/.gnupg \
     --force-clean \
     --subject="Build of ${app_id} at ${now}" \
     --install-deps-from=flathub \

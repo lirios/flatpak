@@ -1,8 +1,17 @@
 name: Build
 
 on:
+  pull_request:
+    branches:
+      - master
+      - develop
   schedule:
     - cron: '0 2 * * *'
+
+env:
+  CI_GPG_KEYID: ${{ secrets.CI_GPG_KEYID }}
+  CI_GPG_KEY: ${{ secrets.CI_GPG_KEY }}
+  CI_GPG_PASSPHRASE: ${{ secrets.CI_GPG_PASSPHRASE }}
 
 jobs:
   build:
@@ -19,7 +28,11 @@ jobs:
           set -x
           dnf install -y dnf-plugins-core
           dnf copr enable -y plfiorini/liri-tools
-          dnf install -y ostree-upload flatpak-builder
+          dnf install -y ostree-upload flatpak-builder gnupg2 pinentry
+      - name: Import GPG key
+        run: |
+          .github/workflows/scripts/setup-gpg
+          gpg --list-keys ${CI_GPG_KEYID}
       - name: Build
         run: |
           set -x
