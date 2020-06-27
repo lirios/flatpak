@@ -1,0 +1,36 @@
+id: io.liri.Terminal
+branch: master
+runtime: org.kde.Platform
+runtime-version: "5.12"
+sdk: org.kde.Sdk
+base: io.liri.BaseApp
+base-version: master
+command: liri-terminal
+tags:
+  - nightly
+desktop-file-name-suffix: " (Nightly)"
+finish-args:
+  - --device=dri
+  - --filesystem=host
+  - --filesystem=xdg-run/dconf
+  - --filesystem=xdg-config/dconf:ro
+  - --socket=wayland
+  - --socket=x11
+  - --share=ipc
+  - --talk-name=ca.desrt.dconf
+  - --talk-name=org.freedesktop.Notifications
+  - --env=DCONF_USER_CONFIG_DIR=.config/dconf
+modules:
+  - name: qtgsettings
+    buildsystem: cmake-ninja
+    sources:
+      - type: git
+        url: git://github.com/lirios/qtgsettings.git
+        branch: develop
+
+  - name: terminal
+    buildsystem: cmake-ninja
+    sources:
+      - type: git
+        url: git://github.com/lirios/terminal.git
+        branch: develop

@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    container:
+      image: fedora:latest
+      options: --privileged --device /dev/fuse
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          set -x
+          dnf install -y dnf-plugins-core
+          dnf copr enable -y plfiorini/liri-tools
+          dnf install -y ostree-upload flatpak-builder
+      - name: Build
+        run: |
+          set -x
+          # Mirror the remote repository and build upon that
+          echo "Mirroring..."
+          mkdir -p repo
+          ostree --repo=repo --mode=archive init
+          ostree --repo=repo remote add --if-not-exists --no-gpg-verify upstream https://repo.liri.io/flatpak/repo
+          for ref in $(ostree --repo=repo remote refs upstream); do
+            ostree --repo=repo pull --mirror --depth=1 ${ref}
+          done
+          # We need to build the base app first because all the apps need it.
+          # Each job's runs in a completely separate worker so the file system
+          # between jobs is not shared. This means we build everything in the
+          # same job, one app after another.
+          for app_id in io.liri.BaseApp io.liri.Fluid.Demo io.liri.Calculator io.liri.Text io.liri.Terminal io.liri.Files io.liri.Browser; do
+            echo -en "\n\n*** Build ${app_id} ***\n\n"
+            .github/workflows/scripts/build.sh ${app_id}
+          done
+      - name: Upload
+        env:
+            OSTREE_UPLOAD_TOKEN: ${{ secrets.OSTREE_UPLOAD_TOKEN }}
+        run: |
+          ostree-upload push \
+            --address=${{ secrets.OSTREE_UPLOAD_URL }}

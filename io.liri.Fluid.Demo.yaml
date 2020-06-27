@@ -1,0 +1,27 @@
+id: io.liri.Fluid.Demo
+branch: master
+runtime: org.kde.Platform
+runtime-version: "5.12"
+sdk: org.kde.Sdk
+base: io.liri.BaseApp
+base-version: "5.12"
+command: fluid-demo
+tags:
+  - nightly
+desktop-file-name-suffix: " (Nightly)"
+finish-args:
+  - --device=dri
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+modules:
+  - name: fluid
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DFLUID_USE_SYSTEM_LCS:BOOL=ON
+      - -DFLUID_WITH_DOCUMENTATION:BOOL=OFF
+      - -DFLUID_WITH_DEMO:BOOL=ON
+    sources:
+      - type: git
+        url: git://github.com/lirios/fluid.git
+        branch: develop

@@ -1,0 +1,24 @@
+id: io.liri.BaseApp
+branch: master
+runtime: org.kde.Platform
+sdk: org.kde.Sdk
+runtime-version: "5.12"
+separate-locales: false
+modules:
+  - name: cmake-shared
+    buildsystem: cmake-ninja
+    sources:
+      - type: git
+        url: git://github.com/lirios/cmake-shared.git
+        branch: develop
+
+  - name: fluid
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DFLUID_USE_SYSTEM_LCS:BOOL=ON
+      - -DFLUID_WITH_DOCUMENTATION:BOOL=OFF
+      - -DFLUID_WITH_DEMO:BOOL=OFF
+    sources:
+      - type: git
+        url: git://github.com/lirios/fluid.git
+        branch: develop

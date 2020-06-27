@@ -1,0 +1,25 @@
+id: io.liri.Calculator
+branch: master
+runtime: org.kde.Platform
+runtime-version: "5.12"
+sdk: org.kde.Sdk
+base: io.liri.BaseApp
+base-version: master
+command: liri-calculator
+tags:
+  - nightly
+desktop-file-name-suffix: " (Nightly)"
+finish-args:
+  - --device=dri
+  - --socket=wayland
+  - --socket=x11
+  - --share=ipc
+modules:
+  - name: calculator
+    buildsystem: cmake-ninja
+    post-install:
+      - for size in 1024 2048; do rm -rf /app/share/icons/hicolor/${size}x${size}; done
+    sources:
+      - type: git
+        url: git://github.com/lirios/calculator.git
+        branch: develop

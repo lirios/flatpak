@@ -1,7 +1,7 @@
 id: io.liri.AppCenter
 branch: master
 runtime: org.kde.Platform
-runtime-version: "5.11"
+runtime-version: "5.12"
 sdk: org.kde.Sdk
 base: io.liri.BaseApp
 base-version: master
@@ -84,38 +84,15 @@ modules:
       - cp /usr/bin/update-mime-database /app/bin
       - cp /usr/bin/update-desktop-database /app/bin
 
-  - name: libqtxdg
-    buildsystem: cmake-ninja
-    config-opts:
-      - -DQTXDGX_ICONENGINEPLUGIN_INSTALL_PATH=/app/lib/plugins/iconengines/libQt5XdgIconPlugin.so
-    sources:
-      - type: git
-        url: git://github.com/lxqt/libqtxdg.git
-        branch: "3.1.0"
-
   - name: libliri
-    buildsystem: simple
-    build-commands:
-      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
-      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
-      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
-      - qbs config --settings-dir .qbs-settings --list
-      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.qbs.installPrefix:"" modules.lirideployment.prefix:/app
-    cleanup:
-      - /share/qbs
+    buildsystem: cmake-ninja
     sources:
       - type: git
         url: git://github.com/lirios/libliri.git
         branch: develop
 
   - name: appcenter
-    buildsystem: simple
-    build-commands:
-      - qbs setup-toolchains --settings-dir .qbs-settings --type gcc /usr/bin/g++ gcc
-      - qbs setup-qt --settings-dir .qbs-settings /usr/bin/qmake qt5
-      - qbs config --settings-dir .qbs-settings profiles.qt5.baseProfile gcc
-      - qbs config --settings-dir .qbs-settings --list
-      - qbs --settings-dir .qbs-settings -d build --command-echo-mode command-line profile:qt5 qbs.buildVariant:debug modules.qbs.installRoot:/ modules.qbs.installPrefix:"" modules.lirideployment.prefix:/app
+    buildsystem: cmake-ninja
     sources:
       - type: git
         url: git://github.com/lirios/appcenter.git

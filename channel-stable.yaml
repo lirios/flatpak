@@ -1,6 +1,0 @@
-channel: stable
-apps:
-  - stable/io.liri.BaseApp.yaml
-  - stable/io.liri.Calculator.yaml
-  - stable/io.liri.Text.yaml
-  - stable/io.liri.Terminal.yaml
